@@ -1,0 +1,5 @@
+{
+  "displayName": "VS Code Debug Tools for Copilot",
+  "description": "Expose breakpoint and debug-workbench tools to Copilot Chat through a local MCP service.",
+  "mcp.breakpointProvider.label": "VS Code Debug Tools for Copilot"
+}

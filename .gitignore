@@ -1,0 +1,42 @@
+# 编译输出目录
+out/
+*.vsix
+
+# 依赖包目录
+node_modules/
+
+# TypeScript 编译缓存
+*.tsbuildinfo
+
+# 日志文件
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 运行时数据
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 临时文件
+.tmp
+.temp
+
+# 编辑器配置（可选，根据团队需求）
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# 操作系统生成的文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 其他
+.nyc_output
+coverage/
