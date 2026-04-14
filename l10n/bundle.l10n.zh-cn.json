@@ -26,6 +26,5 @@
   "Failed to determine the MCP server port.": "无法确定 MCP 服务器端口。",
   "MCP server error": "MCP 服务器错误",
   "Configured {0} agent configuration(s) and removed {1}.": "已配置 {0} 个代理配置并移除了 {1} 个。",
-  "Failed to configure agent MCP integrations: {0}": "配置代理 MCP 集成失败：{0}",
-  "Configure AI Agent MCP": "配置 AI 代理 MCP"
+  "Failed to configure agent MCP integrations: {0}": "配置代理 MCP 集成失败：{0}"
 }

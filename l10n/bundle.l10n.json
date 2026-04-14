@@ -26,6 +26,5 @@
   "Failed to determine the MCP server port.": "Failed to determine the MCP server port.",
   "MCP server error": "MCP server error",
   "Configured {0} agent configuration(s) and removed {1}.": "Configured {0} agent configuration(s) and removed {1}.",
-  "Failed to configure agent MCP integrations: {0}": "Failed to configure agent MCP integrations: {0}",
-  "Configure AI Agent MCP": "Configure AI Agent MCP"
+  "Failed to configure agent MCP integrations: {0}": "Failed to configure agent MCP integrations: {0}"
 }
