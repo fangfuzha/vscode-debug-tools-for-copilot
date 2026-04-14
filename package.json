@@ -35,7 +35,7 @@
       {
         "command": "debugtools.configureAgentConfigurations",
         "title": "%Configure AI Agent MCP%",
-        "category": "VS Code Debug Tools"
+        "category": "%VS Code Debug Tools%"
       }
     ],
     "chatSkills": [

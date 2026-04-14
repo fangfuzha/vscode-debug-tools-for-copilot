@@ -2,5 +2,6 @@
   "displayName": "VS Code 调试工具 for Copilot",
   "description": "通过本地 MCP 服务向 Copilot Chat 暴露断点和调试工作台工具。",
   "mcp.breakpointProvider.label": "VS Code 调试工具 for Copilot",
-  "Configure AI Agent MCP": "配置 AI 代理 MCP"
+  "Configure AI Agent MCP": "配置 AI 代理 MCP",
+  "VS Code Debug Tools": "VS Code 调试工具"
 }
