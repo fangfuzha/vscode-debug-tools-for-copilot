@@ -17,6 +17,7 @@ import {
 import * as vscode from "vscode";
 
 import { registerBreakpointTools } from "./breakpointMcp.tools";
+import { registerDebugCompatibilitySupport } from "./debugCompatibility";
 import { registerDebugWorkbenchTools } from "./debugWorkbenchMcp.tools";
 import { registerDebugSessionTools } from "./debugSessionMcp.tools";
 import { registerDebugSessionTracking } from "./debugSessionTools/shared";
@@ -182,6 +183,7 @@ async function createBreakpointMcpServer(
   registerBreakpointTools(server);
   registerDebugSessionTools(server);
   registerDebugWorkbenchTools(server, context);
+  registerDebugCompatibilitySupport(server);
 
   return server;
 }
@@ -248,4 +250,18 @@ function closeHttpServer(server: HttpServer): Promise<void> {
       resolve();
     });
   });
+}
+
+/**
+ * Return the current MCP endpoint and keep the agent configuration sync manual.
+ *
+ * @param context Extension context.
+ * @returns The active runtime endpoint.
+ */
+export async function getBreakpointMcpEndpoint(
+  context: vscode.ExtensionContext,
+): Promise<string> {
+  const activeRuntime = await ensureBreakpointMcpRuntime(context);
+
+  return activeRuntime.endpoint;
 }

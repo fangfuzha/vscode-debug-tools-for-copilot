@@ -33,6 +33,7 @@
 ### 3. 支持的工具列表
 
 扩展提供完整的断点和调试工具集，详细说明请参考：
+
 - [中文工具文档](doc/mcp-tools.zh-cn.md)
 - [English Tool Documentation](doc/mcp-tools.en.md)
 

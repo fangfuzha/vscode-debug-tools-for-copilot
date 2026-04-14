@@ -12,6 +12,18 @@ The extension registers a local MCP server and exposes its definition through `v
 - Provider ID: `fangfuzha.vscode-debug-tools-for-copilot`
 - MCP server version: `0.5.0`
 
+## DebugMCP compatibility
+
+The extension also exposes a small compatibility layer so existing DebugMCP-style clients can reuse familiar entry points.
+
+- `get_debug_instructions`: returns a markdown debugging guide.
+- `start_debugging`: starts from a named launch configuration or falls back to an auto-generated configuration from the file path.
+- `get_variables_values`: inspects the current paused frame and returns scope variables.
+- Resources are available under `debugmcp://docs/debug_instructions` and `debugmcp://docs/troubleshooting/<language>`.
+- Use the command palette action `Configure AI Agent MCP` to open a second-level multi-select picker.
+- Existing configured agents are pre-checked, and unchecking them removes their agent entry when you confirm.
+- Existing `debugmcp` entries are updated in place when they are already present.
+
 ## Available tools
 
 ### `list_breakpoints`

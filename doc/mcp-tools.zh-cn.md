@@ -12,6 +12,18 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 - Provider ID：`fangfuzha.vscode-debug-tools-for-copilot`
 - MCP 服务版本：`0.5.0`
 
+## DebugMCP 兼容层
+
+扩展还提供了一组兼容 DebugMCP 的入口，方便直接复用常见客户端的调用方式。
+
+- `get_debug_instructions`：返回 Markdown 格式的调试指南。
+- `start_debugging`：优先启动指定的 launch 配置；如果没有匹配项，则根据文件路径自动生成默认配置。
+- `get_variables_values`：读取当前暂停帧的作用域变量。
+- 资源文档可通过 `debugmcp://docs/debug_instructions` 和 `debugmcp://docs/troubleshooting/<language>` 访问。
+- 当你需要写入或迁移支持的 agent 配置文件时，请通过命令面板执行 `Configure AI Agent MCP`，它会先打开二级多选菜单。
+- 已经配置过的 agent 会默认勾选，取消勾选后在确认时会被移除。
+- 如果配置文件里已经存在 `debugmcp` 条目，会直接在原位置更新，减少迁移成本。
+
 ## 提供的工具
 
 ### `list_breakpoints`

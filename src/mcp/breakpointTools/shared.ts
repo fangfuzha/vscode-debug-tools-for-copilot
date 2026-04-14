@@ -55,6 +55,12 @@ export interface McpServerLike {
     options: { description: string; inputSchema: z.ZodTypeAny },
     handler: (input: TInput, ctx: unknown) => Promise<unknown> | unknown,
   ): void;
+  registerResource(
+    name: string,
+    uriOrTemplate: string,
+    config: { description: string; mimeType: string },
+    readCallback: (uri: URL) => Promise<unknown> | unknown,
+  ): void;
 }
 
 /**
