@@ -2,6 +2,7 @@
   "Extension deactivated.": "Extension deactivated.",
   "Failed to start the VS Code Breakpoint Tools server.": "Failed to start the VS Code Debug Tools for Copilot server.",
   "VS Code Breakpoint Tools": "VS Code Debug Tools for Copilot",
+  "VS Code Debug Tools": "VS Code Debug Tools",
   "List all VS Code breakpoints in the current workspace and return a stable key for each item.": "List all VS Code breakpoints in the current workspace and return a stable key for each item.",
   "Add a source breakpoint for a file path and line number. Line and column values are 1-based.": "Add a source breakpoint for a file path and line number. Line and column values are 1-based.",
   "Add a function breakpoint for a function name. Function name is required and breakpoint properties use the same 1-based and optional condition rules as source breakpoints.": "Add a function breakpoint for a function name. Function name is required and breakpoint properties use the same 1-based and optional condition rules as source breakpoints.",
