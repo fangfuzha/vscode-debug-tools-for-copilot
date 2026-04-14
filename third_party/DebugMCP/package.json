@@ -1,0 +1,112 @@
+{
+  "name": "debugmcpextension",
+  "displayName": "DebugMCP",
+  "description": "Let AI agents debug your code inside VS Code — breakpoints, step-through execution, variable inspection, and expression evaluation. Automatically exposes itself as an MCP (Model Context Protocol) server for seamless integration with AI assistants.",
+  "version": "1.0.9",
+  "publisher": "ozzafar",
+  "author": {
+    "name": "Oz Zafar",
+    "email": "ozzafar@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/microsoft/DebugMCP",
+  "bugs": {
+    "url": "https://github.com/microsoft/DebugMCP/issues"
+  },
+  "keywords": [
+    "debug",
+    "mcp",
+    "debugging",
+    "ai",
+    "microsoft",
+    "vscode-extension",
+    "ai debugging",
+    "copilot debugging",
+    "llm debugging",
+    "model context protocol",
+    "breakpoints",
+    "debugger",
+    "ai agent",
+    "copilot"
+  ],
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "icon": "assets/debug_mcp_icon.png",
+  "categories": [
+    "Debuggers",
+    "AI",
+    "Programming Languages"
+  ],
+  "extensionDependencies": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/microsoft/DebugMCP.git"
+  },
+  "activationEvents": [
+    "onStartupFinished",
+    "onDebug"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "debugmcp.showAgentSelectionPopup",
+        "title": "Show Agent Selection Popup",
+        "category": "DebugMCP"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "debugmcp.showAgentSelectionPopup",
+          "when": "true"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "DebugMCP",
+      "properties": {
+        "debugmcp.timeoutInSeconds": {
+          "type": "number",
+          "default": 180,
+          "description": "Timeout in seconds"
+        },
+        "debugmcp.serverPort": {
+          "type": "number",
+          "default": 3001,
+          "description": "Port number for the DebugMCP server"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@types/express": "^5.0.3",
+    "express": "^5.2.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.3.0",
+    "@types/vscode": "^1.104.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^10.0.1",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "minimatch": "^10.2.1",
+    "diff": "^8.0.3"
+  }
+}
