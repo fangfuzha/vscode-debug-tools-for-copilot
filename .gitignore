@@ -40,3 +40,4 @@ Thumbs.db
 # 其他
 .nyc_output
 coverage/
+third_party

@@ -16,6 +16,7 @@ import {
 
 import * as vscode from "vscode";
 
+import { logger } from "../logger";
 import { registerBreakpointTools } from "./breakpointMcp.tools";
 import { registerDebugCompatibilitySupport } from "./debugCompatibility";
 import { registerDebugWorkbenchTools } from "./debugWorkbenchMcp.tools";
@@ -45,6 +46,8 @@ interface McpServerLike extends BreakpointToolServer {
 
 let runtimePromise: Promise<BreakpointMcpRuntime> | undefined;
 let runtime: BreakpointMcpRuntime | undefined;
+let providerDisposable: vscode.Disposable | undefined;
+let definitionsChanged: vscode.EventEmitter<void> | undefined;
 
 /**
  * 注册断点 MCP 服务，并确保本地 HTTP 服务在后台启动。
@@ -55,9 +58,13 @@ let runtime: BreakpointMcpRuntime | undefined;
 export function registerBreakpointMcpSupport(
   context: vscode.ExtensionContext,
 ): vscode.Disposable {
-  const definitionsChanged = new vscode.EventEmitter<void>();
+  if (providerDisposable) {
+    return providerDisposable;
+  }
 
-  const providerDisposable = vscode.lm.registerMcpServerDefinitionProvider(
+  definitionsChanged = new vscode.EventEmitter<void>();
+
+  providerDisposable = vscode.lm.registerMcpServerDefinitionProvider(
     MCP_PROVIDER_ID,
     {
       onDidChangeMcpServerDefinitions: definitionsChanged.event,
@@ -76,11 +83,14 @@ export function registerBreakpointMcpSupport(
       "Failed to start the VS Code Breakpoint Tools server.",
     );
 
-    console.error(message, error);
+    logger.error(message, error);
     void vscode.window.showErrorMessage(message);
   });
 
-  return vscode.Disposable.from(providerDisposable, definitionsChanged);
+  const disposable = vscode.Disposable.from(providerDisposable, definitionsChanged);
+  context.subscriptions.push(disposable);
+
+  return disposable;
 }
 
 /**
@@ -199,7 +209,7 @@ async function writeInternalServerError(
   response: ServerResponse<IncomingMessage>,
   error: unknown,
 ): Promise<void> {
-  console.error(error);
+  logger.error("Internal MCP server error", error);
 
   if (!response.headersSent) {
     response.statusCode = 500;
@@ -231,6 +241,39 @@ function listenOnLoopback(server: HttpServer): Promise<number> {
       );
     });
   });
+}
+
+/**
+ * Disable the registered breakpoint MCP provider and stop the runtime.
+ */
+export async function disableBreakpointMcpSupport(): Promise<void> {
+  if (providerDisposable) {
+    providerDisposable.dispose();
+    providerDisposable = undefined;
+  }
+
+  if (definitionsChanged) {
+    definitionsChanged.dispose();
+    definitionsChanged = undefined;
+  }
+
+  await disposeBreakpointMcpRuntime();
+}
+
+/**
+ * Returns whether the breakpoint MCP provider is currently enabled.
+ */
+export function isBreakpointMcpSupportEnabled(): boolean {
+  return Boolean(providerDisposable);
+}
+
+async function disposeBreakpointMcpRuntime(): Promise<void> {
+  if (runtime) {
+    await runtime.dispose();
+  }
+
+  runtime = undefined;
+  runtimePromise = undefined;
 }
 
 /**

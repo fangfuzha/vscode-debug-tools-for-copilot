@@ -304,12 +304,6 @@ function getSupportedAgentTargets(): AgentTarget[] {
 
   return [
     {
-      id: "copilot",
-      displayName: "GitHub Copilot",
-      configPath: path.join(configBasePath, "Code", "User", "mcp.json"),
-      serverFieldName: "servers",
-    },
-    {
       id: "cline",
       displayName: "Cline",
       configPath: path.join(

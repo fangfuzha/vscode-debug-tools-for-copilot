@@ -1,9 +1,11 @@
 node_modules
 src
+!src/lm/skills/**
+!src/lm/skills/**/*
 .git
 .gitignore
 tsconfig.json
-.vscode/tasks.json
+.vscode
 *.tsbuildinfo
 .nyc_output
 coverage
@@ -18,3 +20,4 @@ pnpm-lock.yaml
 .npmrc
 .github
 *.vsix
+third_party
