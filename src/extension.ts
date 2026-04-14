@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
+import { promptAndApplyAgentConfigurations } from "./mcp/agentConfigurationManager";
 import { registerBreakpointMcpSupport } from "./mcp/breakpointMcp";
+import { getBreakpointMcpEndpoint } from "./mcp/breakpointMcp";
 
 /**
  * @description 插件激活回调函数
@@ -7,6 +9,39 @@ import { registerBreakpointMcpSupport } from "./mcp/breakpointMcp";
  */
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(registerBreakpointMcpSupport(context));
+
+  const configureAgentsCommand = vscode.commands.registerCommand(
+    "debugtools.configureAgentConfigurations",
+    async () => {
+      try {
+        const endpoint = await getBreakpointMcpEndpoint(context);
+
+        const result = await promptAndApplyAgentConfigurations(endpoint);
+
+        if (!result) {
+          return;
+        }
+
+        vscode.window.showInformationMessage(
+          vscode.l10n.t(
+            "Configured {0} agent configuration(s) and removed {1}.",
+            result.updatedAgents.length.toString(),
+            result.removedAgents.length.toString(),
+          ),
+        );
+      } catch (error) {
+        console.error("Failed to configure agent MCP integrations.", error);
+        void vscode.window.showErrorMessage(
+          vscode.l10n.t(
+            "Failed to configure agent MCP integrations: {0}",
+            String(error),
+          ),
+        );
+      }
+    },
+  );
+
+  context.subscriptions.push(configureAgentsCommand);
 }
 
 /**
