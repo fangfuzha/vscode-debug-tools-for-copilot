@@ -20,7 +20,8 @@
   },
   "l10n": "./l10n",
   "activationEvents": [
-    "onDebug"
+    "onDebug",
+    "onStartupFinished"
   ],
   "categories": [
     "AI",
@@ -30,6 +31,13 @@
   "icon": "icon.png",
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "debugtools.configureAgentConfigurations",
+        "title": "%Configure AI Agent MCP%",
+        "category": "VS Code Debug Tools"
+      }
+    ],
     "chatSkills": [
       {
         "path": "./src/lm/skills/breakpoint-mcp-tools-guide/SKILL.md"
