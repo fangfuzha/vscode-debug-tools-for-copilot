@@ -217,60 +217,60 @@ Compatibility notes:
  */
 function getTroubleshootingMarkdown(language: CompatibilityLanguage): string {
   const contentByLanguage: Record<CompatibilityLanguage, string> = {
-    python: `# Python Debugging Tips
+    python: vscode.l10n.t(`# Python Debugging Tips
 
 - Make sure the Python extension is installed and the correct interpreter is selected.
 - For tests, prefer a launch configuration that uses your test runner explicitly.
 - If the script starts but breakpoints are skipped, check source path mappings and virtual environment activation.
-`,
-    javascript: `# JavaScript Debugging Tips
+`),
+    javascript: vscode.l10n.t(`# JavaScript Debugging Tips
 
 - Use a Node-compatible debug type such as \`pwa-node\`.
 - Make sure the file you launch is runnable JavaScript or is loaded through a transpilation setup.
 - Verify \`cwd\`, \`program\`, and source maps when breakpoints do not bind.
-`,
-    typescript: `# TypeScript Debugging Tips
+`),
+    typescript: vscode.l10n.t(`# TypeScript Debugging Tips
 
 - Prefer a Node-based debug configuration that understands transpiled output or source maps.
 - If you debug the source file directly, confirm that your runtime can execute TypeScript.
 - Check \`outFiles\` and source maps when breakpoints land in compiled output instead of source.
-`,
-    java: `# Java Debugging Tips
+`),
+    java: vscode.l10n.t(`# Java Debugging Tips
 
 - Make sure the Java language support extension is installed.
 - Prefer a launch configuration that resolves the correct main class or test class.
 - If the debugger cannot attach, verify the project structure and classpath resolution.
-`,
-    csharp: `# C# Debugging Tips
+`),
+    csharp: vscode.l10n.t(`# C# Debugging Tips
 
 - Make sure the C# / .NET debugging extension is installed.
 - Open the solution or project root so the debugger can resolve the build output.
 - If the session fails to start, confirm that the target project builds successfully first.
-`,
-    go: `# Go Debugging Tips
+`),
+    go: vscode.l10n.t(`# Go Debugging Tips
 
 - Make sure the Go extension is installed and configured.
 - Verify that the current workspace contains a runnable Go module or package.
 - If breakpoints are skipped, confirm that the binary was built with matching source paths.
-`,
-    rust: `# Rust Debugging Tips
+`),
+    rust: vscode.l10n.t(`# Rust Debugging Tips
 
 - Make sure your Rust debug extension and debugger backend are installed.
 - Prefer a debug configuration that launches the compiled binary with matching symbols.
 - If the session stops in unexpected locations, check build profile and debug symbol generation.
-`,
-    php: `# PHP Debugging Tips
+`),
+    php: vscode.l10n.t(`# PHP Debugging Tips
 
 - Make sure the PHP debugger extension is installed and configured.
 - Verify the PHP interpreter path and any remote or container mappings.
 - If breakpoints do not bind, confirm that the web server or CLI entrypoint matches the launched file.
-`,
-    ruby: `# Ruby Debugging Tips
+`),
+    ruby: vscode.l10n.t(`# Ruby Debugging Tips
 
 - Make sure the Ruby debugger extension is installed.
 - Confirm that the selected Ruby version matches the project runtime.
 - If execution starts but breakpoints are skipped, check bundler setup and source mapping.
-`,
+`),
   };
 
   return contentByLanguage[language];
