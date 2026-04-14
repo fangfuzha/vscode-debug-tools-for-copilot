@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
-import { promptAndApplyAgentConfigurations } from "./mcp/agentConfigurationManager";
+import { promptAndApplyAgentConfigurations } from "./mcp/agentConfig";
 import {
   registerBreakpointMcpSupport,
   getBreakpointMcpEndpoint,
-} from "./mcp/breakpointMcp";
+} from "./mcp/server";
 import { logger } from "./logger";
 
 /**
@@ -12,6 +12,15 @@ import { logger } from "./logger";
  */
 export function activate(context: vscode.ExtensionContext) {
   logger.info(vscode.l10n.t("Extension activated."));
+
+  // 只在调试模式下显示测试日志
+  if (vscode.debug.activeDebugSession) {
+    logger.error("测试错误级别日志 - 应该显示为红色");
+    logger.warn("测试警告级别日志 - 应该显示为橙色");
+    logger.info("测试信息级别日志 - 应该显示为蓝色");
+    logger.debug("测试调试级别日志 - 应该显示为灰色");
+  }
+
   context.subscriptions.push(registerBreakpointMcpSupport(context));
   registerCommands(context);
 }

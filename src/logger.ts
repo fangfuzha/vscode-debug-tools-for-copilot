@@ -1,13 +1,25 @@
 import * as vscode from "vscode";
 
-const OUTPUT_CHANNEL_NAME = "VS Code Debug Tools";
-const outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
+const OUTPUT_CHANNEL_NAME = vscode.l10n.t("VS Code Debug Tools");
+const outputChannel = vscode.window.createOutputChannel(
+  OUTPUT_CHANNEL_NAME,
+  "log",
+);
 
 /**
- * 返回当前时间的 ISO 8601 字符串表示。
+ * 返回当前时间的本地时间字符串表示。
  */
 function formatTimestamp(): string {
-  return new Date().toISOString();
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+  const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
 }
 
 /**

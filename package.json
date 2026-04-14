@@ -56,6 +56,64 @@
         "id": "fangfuzha.vscode-debug-tools-for-copilot",
         "label": "%mcp.breakpointProvider.label%"
       }
+    ],
+    "languages": [
+      {
+        "id": "log",
+        "aliases": [
+          "Log",
+          "log"
+        ],
+        "extensions": [
+          ".log"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "log",
+        "scopeName": "text.log",
+        "path": "./syntaxes/log.tmLanguage.json"
+      }
+    ],
+    "colors": [
+      {
+        "id": "log.error",
+        "description": "Color for error log level",
+        "defaults": {
+          "dark": "#f48771",
+          "light": "#e45649",
+          "highContrast": "#f48771"
+        }
+      },
+      {
+        "id": "log.warning",
+        "description": "Color for warning log level",
+        "defaults": {
+          "dark": "#cca700",
+          "light": "#e2c08d",
+          "highContrast": "#cca700"
+        }
+      },
+      {
+        "id": "log.info",
+        "description": "Color for info log level",
+        "defaults": {
+          "dark": "#3794ff",
+          "light": "#0e70c0",
+          "highContrast": "#3794ff"
+        }
+      },
+      {
+        "id": "log.debug",
+        "description": "Color for debug log level",
+        "defaults": {
+          "dark": "#6a9955",
+          "light": "#098658",
+          "highContrast": "#6a9955"
+        }
+      }
     ]
   },
   "dependencies": {

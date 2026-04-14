@@ -2,6 +2,7 @@
   "Extension deactivated.": "扩展已停用。",
   "Failed to start the VS Code Breakpoint Tools server.": "无法启动 VS Code 调试工具 for Copilot 服务。",
   "VS Code Breakpoint Tools": "VS Code 调试工具 for Copilot",
+  "VS Code Debug Tools": "VS Code 调试工具",
   "List all VS Code breakpoints in the current workspace and return a stable key for each item.": "列出当前工作区中的所有 VS Code 断点，并为每一项返回一个稳定 key。",
   "Add a source breakpoint for a file path and line number. Line and column values are 1-based.": "根据文件路径和行号添加源断点。行号和列号从 1 开始。",
   "Add a function breakpoint for a function name. Function name is required and breakpoint properties use the same 1-based and optional condition rules as source breakpoints.": "根据函数名添加函数断点。函数名必填，断点属性遵循与源断点相同的 1 基规则和可选条件规则。",
