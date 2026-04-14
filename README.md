@@ -9,6 +9,33 @@
 - 支持 TypeScript 开发
 - 包含完整的测试和代码检查配置
 
+## 扩展用法
+
+### 1. 安装与配置
+
+安装扩展后，首次使用需要配置 AI agent：
+
+1. 按 `Ctrl+Shift+P` 打开命令面板
+2. 输入 "Configure AI Agent MCP" 并执行
+3. 在弹出的选择框中勾选要配置的 agent（GitHub Copilot、Cline、Cursor）
+4. 点击确定，扩展会自动修改相应配置文件
+
+### 2. 在 Copilot 中使用断点工具
+
+配置完成后，您可以在 Copilot Chat 中使用以下断点管理功能：
+
+- **查看断点**：询问 Copilot "列出当前工作区的所有断点"
+- **添加断点**：询问 Copilot "在第10行添加断点" 或 "在函数foo处添加断点"
+- **删除断点**：询问 Copilot "删除第10行的断点"
+- **启用/禁用断点**：询问 Copilot "禁用第10行的断点"
+- **调试控制**：询问 Copilot "开始调试" 或 "单步执行"
+
+### 3. 支持的工具列表
+
+扩展提供完整的断点和调试工具集，详细说明请参考：
+- [中文工具文档](doc/mcp-tools.zh-cn.md)
+- [English Tool Documentation](doc/mcp-tools.en.md)
+
 ## 开发环境要求
 
 - Node.js 20.x 或更高版本
