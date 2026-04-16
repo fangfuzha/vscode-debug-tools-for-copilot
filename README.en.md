@@ -2,12 +2,12 @@
 
 A VS Code extension that exposes breakpoint and debug-workbench tools to Copilot Chat through a local MCP service.
 
-## Features
+## Features and Usage
 
 - Registers a local MCP server named `VS Code Debug Tools for Copilot`
-- Lets Copilot manage breakpoints in the current workspace
-- Supports TypeScript development
-- Includes tests and linting configuration
+- Lets Copilot manage breakpoints and debug workbench actions in the current workspace
+- Provides diagnostics, configuration export, and multi-root workspace support
+- Supports TypeScript development and includes tests and linting configuration
 
 ## Usage
 
@@ -19,7 +19,15 @@ After installing the extension, you need to configure your AI agent the first ti
 2. Run `Configure AI Agent MCP`
 3. In the picker, select the agents you want to configure (`Cline`, `Cursor`)
 4. Confirm the selection, and the extension will update the corresponding configuration files
-5. To inspect the current MCP endpoint, agent configuration, and debug state, run `Show MCP Diagnostics`
+5. After that, the extension automatically refreshes already configured clients to the current MCP endpoint on startup
+6. To inspect the current MCP endpoint, agent configuration, and debug state, run `Show MCP Diagnostics`
+7. To generate a reusable JSON snippet for another MCP-compatible client, run `Export MCP Configuration`
+
+The extension also ships with a Copilot skill that helps Copilot choose the right breakpoint and debug tools:
+
+- [Breakpoint MCP Tools Guide](src/lm/skills/breakpoint-mcp-tools-guide/SKILL.md)
+
+This skill focuses on tool selection and parameter rules. The user-facing installation and usage flow is centralized in this page.
 
 ### 2. Use breakpoint tools in Copilot
 
@@ -86,24 +94,13 @@ These documents include the full tool list, input structures, return values, mat
    - Run the command that shows the welcome message
    - You should see the welcome notification
 
-5. **Use the Copilot MCP breakpoint tools**
-
-   The extension also ships with a Copilot skill:
-   - [Breakpoint MCP Tools Guide](src/lm/skills/breakpoint-mcp-tools-guide/SKILL.md)
-
-   The detailed tool documentation has been moved to the `doc/` directory:
-   - [doc/mcp-tools.zh-cn.md](doc/mcp-tools.zh-cn.md): Chinese version
-   - [doc/mcp-tools.en.md](doc/mcp-tools.en.md): English version
-
-   These documents cover the complete tool list, input shapes, return values, matching rules, and path handling guidance.
-
-6. **Run lint**
+5. **Run lint**
 
    ```sh
    npm run lint
    ```
 
-7. **Run tests**
+6. **Run tests**
 
    ```sh
    npm test

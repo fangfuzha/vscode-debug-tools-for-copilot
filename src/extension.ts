@@ -1,6 +1,10 @@
 import * as vscode from "vscode";
-import { promptAndApplyAgentConfigurations } from "./mcp/agentConfig";
+import {
+  promptAndApplyAgentConfigurations,
+  refreshConfiguredAgentConfigurations,
+} from "./mcp/agentConfig";
 import { disposeMcpDiagnostics, showMcpDiagnostics } from "./mcp/diagnostics";
+import { showMcpConfigurationExport } from "./mcp/exportConfiguration";
 import {
   registerBreakpointMcpSupport,
   getBreakpointMcpEndpoint,
@@ -24,6 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(registerBreakpointMcpSupport(context));
   registerCommands(context);
+  void refreshConfiguredAgentsOnStartup(context);
 }
 
 function registerCommands(context: vscode.ExtensionContext) {
@@ -64,7 +69,48 @@ function registerCommands(context: vscode.ExtensionContext) {
     },
   );
 
-  context.subscriptions.push(configureAgentsCommand, showDiagnosticsCommand);
+  const exportConfigurationCommand = vscode.commands.registerCommand(
+    "debugtools.export-mcp-configuration",
+    async () => {
+      await showMcpConfigurationExport(context);
+    },
+  );
+
+  context.subscriptions.push(
+    configureAgentsCommand,
+    showDiagnosticsCommand,
+    exportConfigurationCommand,
+  );
+}
+
+/**
+ * Refresh already configured agent clients after the extension activates.
+ *
+ * @param context Extension context used to resolve the active MCP endpoint.
+ */
+async function refreshConfiguredAgentsOnStartup(
+  context: vscode.ExtensionContext,
+): Promise<void> {
+  try {
+    const endpoint = await getBreakpointMcpEndpoint(context);
+    const result = await refreshConfiguredAgentConfigurations(endpoint);
+
+    if (!result || result.updatedAgents.length === 0) {
+      return;
+    }
+
+    logger.info(
+      vscode.l10n.t(
+        "Refreshed {0} configured agent configuration(s) on startup.",
+        result.updatedAgents.length.toString(),
+      ),
+    );
+  } catch (error) {
+    logger.error(
+      "Failed to refresh configured agent MCP integrations on startup.",
+      error,
+    );
+  }
 }
 
 /**

@@ -303,7 +303,7 @@ function closeHttpServer(server: HttpServer): Promise<void> {
 }
 
 /**
- * Return the current MCP endpoint and keep the agent configuration sync manual.
+ * Return the current MCP endpoint.
  *
  * @param context Extension context.
  * @returns The active runtime endpoint.

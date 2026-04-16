@@ -7,6 +7,13 @@ description: "Use when the user asks how to use the breakpoint or debug-session 
 
 Use this skill when explaining or choosing the extension's breakpoint MCP tools.
 
+For installation, configuration, and user-facing usage, see the main README first:
+
+- 中文说明: [README.md](../../../../README.md)
+- English guide: [README.en.md](../../../../README.en.md)
+
+This skill only covers tool selection, parameter rules, and Copilot-side guidance after the extension has been configured.
+
 ## Tool selection
 
 - `list_breakpoints`: use first when the current breakpoint state is unknown.
@@ -73,8 +80,10 @@ Use this skill when explaining or choosing the extension's breakpoint MCP tools.
 7. For pause/continue/step/restart/stop requests, choose the matching debug-session tool instead of a breakpoint tool.
 8. When the target debug session is ambiguous, call `list_debug_sessions` first and then pass the selected `sessionId`.
 9. When you need a thread id for stepping within a selected session, call `list_debug_threads` first.
+10. When the user asks for a reusable MCP configuration snippet for another client, direct them to the `Export MCP Configuration` command.
 
 ## Reference
 
+- User guide: [README.md](../../../../README.md) / [README.en.md](../../../../README.en.md)
 - 中文说明: [doc/mcp-tools.zh-cn.md](../../../../doc/mcp-tools.zh-cn.md)
 - English guide: [doc/mcp-tools.en.md](../../../../doc/mcp-tools.en.md)

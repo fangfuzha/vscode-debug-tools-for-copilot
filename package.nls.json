@@ -6,5 +6,8 @@
   "debugtools.add-mcp-to-agent": "Configure AI Agent MCP",
   "Show MCP Diagnostics": "Show MCP Diagnostics",
   "debugtools.show-mcp-diagnostics": "Show MCP Diagnostics",
+  "Export MCP Configuration": "Export MCP Configuration",
+  "debugtools.export-mcp-configuration": "Export MCP Configuration",
+  "Refreshed {0} configured agent configuration(s) on startup.": "Refreshed {0} configured agent configuration(s) on startup.",
   "VS Code Debug Tools": "VS Code Debug Tools"
 }
