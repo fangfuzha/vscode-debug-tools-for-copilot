@@ -2,12 +2,12 @@
 
 一个通过本地 MCP 服务向 Copilot Chat 暴露断点和调试工作台工具的 VS Code 扩展。
 
-## 功能特性
+## 功能与使用
 
 - 注册本地 MCP 服务 `VS Code Debug Tools for Copilot`
-- 支持通过 Copilot 管理当前工作区的断点
-- 支持 TypeScript 开发
-- 包含完整的测试和代码检查配置
+- 通过 Copilot 管理当前工作区的断点和调试工作台
+- 提供诊断、配置导出和多工作区支持
+- 支持 TypeScript 开发，并包含完整的测试和代码检查配置
 
 ## 扩展用法
 
@@ -19,7 +19,15 @@
 2. 输入 "Configure AI Agent MCP" 并执行
 3. 在弹出的选择框中勾选要配置的 agent（Cline、Cursor）
 4. 点击确定，扩展会自动修改相应配置文件
-5. 需要查看当前 MCP endpoint、代理配置和调试状态时，可以直接执行 "Show MCP Diagnostics"
+5. 之后每次启动时，扩展会自动刷新已经配置过的客户端到当前 MCP endpoint
+6. 需要查看当前 MCP endpoint、代理配置和调试状态时，可以直接执行 "Show MCP Diagnostics"
+7. 如果要给其他兼容 MCP 的客户端生成可复用的配置片段，可以执行 "Export MCP Configuration"
+
+Copilot skill 也随扩展提供，用来帮助 Copilot 选择正确的断点和调试工具：
+
+- [Breakpoint MCP Tools Guide](src/lm/skills/breakpoint-mcp-tools-guide/SKILL.md)
+
+这部分面向 Copilot 的工具选择和参数规则；用户的安装、配置和使用说明都集中在本页。
 
 ### 2. 在 Copilot 中使用断点工具
 
@@ -83,24 +91,13 @@
    - 输入 "显示欢迎消息" 并执行
    - 应该看到弹出的欢迎信息
 
-5. **使用 Copilot 的 MCP 断点工具**
-
-   同时提供了一个 Copilot skill：
-   - [Breakpoint MCP Tools Guide](src/lm/skills/breakpoint-mcp-tools-guide/SKILL.md)
-
-   详细说明已迁移到 `doc/` 目录中的文档：
-   - [doc/mcp-tools.zh-cn.md](doc/mcp-tools.zh-cn.md)：中文版本
-   - [doc/mcp-tools.en.md](doc/mcp-tools.en.md)：English version
-
-   这些文档包含完整的工具列表、输入结构、返回值、匹配规则和路径处理说明。
-
-6. **代码检查**
+5. **代码检查**
 
    ```sh
    npm run lint
    ```
 
-7. **运行测试**
+6. **运行测试**
 
    ```sh
    npm test

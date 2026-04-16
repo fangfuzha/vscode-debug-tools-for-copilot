@@ -49,10 +49,12 @@ export async function showMcpDiagnostics(
 
     const copyEndpointLabel = vscode.l10n.t("Copy Endpoint");
     const configureAgentsLabel = vscode.l10n.t("Configure AI Agent MCP");
+    const exportConfigurationLabel = vscode.l10n.t("Export MCP Configuration");
     const selection = await vscode.window.showInformationMessage(
       vscode.l10n.t("MCP diagnostics were written to the output channel."),
       copyEndpointLabel,
       configureAgentsLabel,
+      exportConfigurationLabel,
     );
 
     if (selection === copyEndpointLabel) {
@@ -62,6 +64,13 @@ export async function showMcpDiagnostics(
 
     if (selection === configureAgentsLabel) {
       await vscode.commands.executeCommand("debugtools.add-mcp-to-agent");
+      return;
+    }
+
+    if (selection === exportConfigurationLabel) {
+      await vscode.commands.executeCommand(
+        "debugtools.export-mcp-configuration",
+      );
     }
   } catch (error) {
     const message = vscode.l10n.t(

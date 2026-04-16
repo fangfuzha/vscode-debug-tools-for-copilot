@@ -41,6 +41,11 @@
         "command": "debugtools.show-mcp-diagnostics",
         "title": "%debugtools.show-mcp-diagnostics%",
         "category": "%VS Code Debug Tools%"
+      },
+      {
+        "command": "debugtools.export-mcp-configuration",
+        "title": "%debugtools.export-mcp-configuration%",
+        "category": "%VS Code Debug Tools%"
       }
     ],
     "menus": {
@@ -51,6 +56,10 @@
         },
         {
           "command": "debugtools.show-mcp-diagnostics",
+          "when": "true"
+        },
+        {
+          "command": "debugtools.export-mcp-configuration",
           "when": "true"
         }
       ]

@@ -1,37 +1,22 @@
 import * as fs from "node:fs";
-import * as os from "node:os";
 import * as path from "node:path";
 
 import * as vscode from "vscode";
-
-/**
- * Supported AI agent configuration targets.
- */
-interface AgentTarget {
-  id: string;
-  displayName: string;
-  configPath: string;
-  serverFieldName: "servers" | "mcpServers";
-}
+import {
+  createMcpServerConfiguration,
+  getAgentConfigurationTargets,
+  SERVER_ENTRY_NAME,
+  type AgentConfigurationTarget,
+  type AgentServerConfiguration,
+} from "./clientRegistry";
 
 /**
  * Runtime state for one agent configuration target.
  */
 export interface AgentTargetState {
-  target: AgentTarget;
+  target: AgentConfigurationTarget;
   configured: boolean;
   entryName?: string;
-}
-
-/**
- * MCP server configuration persisted to agent config files.
- */
-interface AgentServerConfiguration {
-  autoApprove: string[];
-  disabled: boolean;
-  timeout: number;
-  type: string;
-  url: string;
 }
 
 /**
@@ -51,9 +36,7 @@ interface AgentConfigurationPickItem extends vscode.QuickPickItem {
   targetId: string;
 }
 
-const SERVER_ENTRY_NAME = "vscode-debug-tools-for-copilot";
 const LEGACY_ENTRY_NAME = "debugmcp";
-const DEFAULT_TIMEOUT_SECONDS = 180;
 
 /**
  * Show the second-level agent picker and apply the user's selection.
@@ -78,6 +61,30 @@ export async function promptAndApplyAgentConfigurations(
 }
 
 /**
+ * Refresh all currently configured agent files to the latest MCP endpoint.
+ *
+ * This keeps already configured clients in sync during extension startup without
+ * touching unconfigured clients.
+ *
+ * @param endpoint Current MCP endpoint, for example `http://127.0.0.1:3001/mcp`.
+ * @returns A summary of the refreshed configurations, or undefined when no configured agents are present.
+ */
+export async function refreshConfiguredAgentConfigurations(
+  endpoint: string,
+): Promise<AgentConfigurationSyncResult | undefined> {
+  const agentStates = await inspectAgentTargets();
+  const configuredAgentIds = agentStates
+    .filter((state) => state.configured)
+    .map((state) => state.target.id);
+
+  if (configuredAgentIds.length === 0) {
+    return undefined;
+  }
+
+  return syncAgentConfigurations(endpoint, configuredAgentIds);
+}
+
+/**
  * Synchronize supported agent configuration files according to the selected agents.
  *
  * Agents included in `selectedAgentIds` are written or updated. Agents that are
@@ -99,7 +106,7 @@ export async function syncAgentConfigurations(
     createdFiles: [],
   };
 
-  for (const target of getSupportedAgentTargets()) {
+  for (const target of getAgentConfigurationTargets()) {
     const shouldBeConfigured = selectedSet.has(target.id);
 
     try {
@@ -124,11 +131,13 @@ export async function syncAgentConfigurations(
         const existingEntry = serverContainer[managedEntryName] as
           | Partial<AgentServerConfiguration>
           | undefined;
+        const nextEntry = createMcpServerConfiguration(endpoint, existingEntry);
 
-        serverContainer[managedEntryName] = buildServerConfiguration(
-          endpoint,
-          existingEntry,
-        );
+        if (isSameAgentServerConfiguration(existingEntry, nextEntry)) {
+          continue;
+        }
+
+        serverContainer[managedEntryName] = nextEntry;
 
         if (!fileExists) {
           ensureParentDirectory(target.configPath);
@@ -171,7 +180,7 @@ export async function syncAgentConfigurations(
  * @returns Agent states used to pre-check the picker.
  */
 export async function inspectAgentTargets(): Promise<AgentTargetState[]> {
-  return getSupportedAgentTargets().map((target) => {
+  return getAgentConfigurationTargets().map((target) => {
     const rootConfig = readJsonFile(target.configPath);
 
     if (!rootConfig) {
@@ -275,66 +284,6 @@ async function showAgentSelectionQuickPick(
   });
 }
 /**
- * Resolve the directory that stores per-user agent configuration files.
- *
- * @returns The config base path for the current operating system.
- */
-function getConfigBasePath(): string {
-  const userHome = os.homedir();
-
-  switch (os.platform()) {
-    case "win32":
-      return process.env.APPDATA ?? path.join(userHome, "AppData", "Roaming");
-    case "darwin":
-      return path.join(userHome, "Library", "Application Support");
-    case "linux":
-      return process.env.XDG_CONFIG_HOME ?? path.join(userHome, ".config");
-    default:
-      return process.env.APPDATA ?? path.join(userHome, "AppData", "Roaming");
-  }
-}
-
-/**
- * Return the supported agent configuration targets.
- *
- * @returns Agent targets that can be synced automatically.
- */
-function getSupportedAgentTargets(): AgentTarget[] {
-  const configBasePath = getConfigBasePath();
-
-  return [
-    {
-      id: "cline",
-      displayName: "Cline",
-      configPath: path.join(
-        configBasePath,
-        "Code",
-        "User",
-        "globalStorage",
-        "saoudrizwan.claude-dev",
-        "settings",
-        "cline_mcp_settings.json",
-      ),
-      serverFieldName: "mcpServers",
-    },
-    {
-      id: "cursor",
-      displayName: "Cursor",
-      configPath: path.join(
-        configBasePath,
-        "Cursor",
-        "User",
-        "globalStorage",
-        "cursor.mcp",
-        "settings",
-        "mcp_settings.json",
-      ),
-      serverFieldName: "mcpServers",
-    },
-  ];
-}
-
-/**
  * Read and parse a JSON configuration file.
  *
  * @param filePath Configuration file path.
@@ -404,13 +353,44 @@ function ensureRecord(
 }
 
 /**
- * Decide which entry name to update or create inside an agent config file.
+ * Check whether an existing server entry already matches the target configuration.
  *
- * Existing DebugMCP entries keep their original name to avoid unnecessary churn.
- *
- * @param serverContainer The MCP server container object inside the config file.
- * @returns The entry name that should be updated.
+ * @param existingEntry Existing server entry from the configuration file.
+ * @param nextEntry Normalized server entry that would be written.
+ * @returns Whether the existing entry already matches the target configuration.
  */
+function isSameAgentServerConfiguration(
+  existingEntry: Partial<AgentServerConfiguration> | undefined,
+  nextEntry: AgentServerConfiguration,
+): boolean {
+  if (!existingEntry) {
+    return false;
+  }
+
+  const existingRecord = existingEntry as Record<string, unknown>;
+  const existingKeys = Object.keys(existingRecord);
+  const nextKeys = Object.keys(nextEntry);
+
+  if (existingKeys.length !== nextKeys.length) {
+    return false;
+  }
+
+  return nextKeys.every((key) => {
+    const existingValue = existingRecord[key];
+    const nextValue = nextEntry[key as keyof AgentServerConfiguration];
+
+    if (Array.isArray(nextValue)) {
+      return (
+        Array.isArray(existingValue) &&
+        existingValue.length === nextValue.length &&
+        existingValue.every((item, index) => item === nextValue[index])
+      );
+    }
+
+    return existingValue === nextValue;
+  });
+}
+
 /**
  * Decide which existing entry name should be treated as managed by this extension.
  *
@@ -429,36 +409,4 @@ function getManagedEntryName(
   }
 
   return undefined;
-}
-
-/**
- * Build the MCP server configuration stored in an agent config file.
- *
- * @param endpoint Current MCP endpoint.
- * @param existingEntry Existing entry to preserve user preferences from.
- * @returns The normalized server configuration.
- */
-function buildServerConfiguration(
-  endpoint: string,
-  existingEntry?: Partial<AgentServerConfiguration>,
-): AgentServerConfiguration {
-  const autoApprove = Array.isArray(existingEntry?.autoApprove)
-    ? existingEntry.autoApprove.filter(
-        (value): value is string => typeof value === "string",
-      )
-    : [];
-
-  return {
-    autoApprove,
-    disabled:
-      typeof existingEntry?.disabled === "boolean"
-        ? existingEntry.disabled
-        : false,
-    timeout:
-      typeof existingEntry?.timeout === "number"
-        ? existingEntry.timeout
-        : DEFAULT_TIMEOUT_SECONDS,
-    type: "streamableHttp",
-    url: endpoint,
-  };
 }
