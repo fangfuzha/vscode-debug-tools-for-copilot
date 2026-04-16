@@ -23,16 +23,20 @@ export function registerSetBreakpointsEnabledInFileTool(
       ),
       inputSchema: z.object({
         filePath: z.string().min(1),
+        workspaceFolderPath: z.string().min(1).optional(),
         enabled: z.boolean(),
       }),
     },
     async (input: SetBreakpointsEnabledInFileInput) => {
-      const matches = findSourceBreakpointsInFile(input.filePath);
+      const matches = findSourceBreakpointsInFile(
+        input.filePath,
+        input.workspaceFolderPath,
+      );
 
       if (matches.length === 0) {
         return createTextResult({
           enabled: input.enabled,
-          filePath: resolveFilePath(input.filePath),
+          filePath: resolveFilePath(input.filePath, input.workspaceFolderPath),
           updated: [],
           updatedCount: 0,
         });
@@ -51,7 +55,7 @@ export function registerSetBreakpointsEnabledInFileTool(
 
       return createTextResult({
         enabled: input.enabled,
-        filePath: resolveFilePath(input.filePath),
+        filePath: resolveFilePath(input.filePath, input.workspaceFolderPath),
         updated: updatedBreakpoints.map(snapshotBreakpoint),
         updatedCount: updatedBreakpoints.length,
       });

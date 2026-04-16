@@ -1,3 +1,4 @@
+import * as fs from "node:fs";
 import * as path from "node:path";
 import * as vscode from "vscode";
 
@@ -28,6 +29,7 @@ export interface BreakpointSearchInput {
 export interface BreakpointModificationInput {
   key?: string;
   filePath?: string;
+  workspaceFolderPath?: string;
   line?: number;
   column?: number;
   functionName?: string;
@@ -45,20 +47,50 @@ export interface BreakpointUpdateInput extends BreakpointModificationInput {
 
 export interface SetBreakpointsEnabledInFileInput {
   filePath: string;
+  workspaceFolderPath?: string;
   enabled: boolean;
 }
 
 /**
  * Normalize a workspace-relative or absolute path to an absolute file path.
+ *
+ * Relative paths are resolved against the provided workspace folder when one is
+ * supplied. Otherwise, a single workspace folder is used automatically and a
+ * multi-root workspace falls back to unique path inference.
+ *
+ * @param filePath File path to resolve.
+ * @param workspaceFolderPath Optional workspace folder root used to disambiguate relative paths.
+ * @returns An absolute normalized file path.
  */
-export function resolveFilePath(filePath: string): string {
+export function resolveFilePath(
+  filePath: string,
+  workspaceFolderPath?: string,
+): string {
   if (path.isAbsolute(filePath)) {
     return path.normalize(filePath);
   }
 
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
 
-  if (!workspaceFolder) {
+  if (workspaceFolderPath) {
+    const explicitWorkspaceFolder =
+      findWorkspaceFolderByPath(workspaceFolderPath);
+
+    if (!explicitWorkspaceFolder) {
+      throw new Error(
+        vscode.l10n.t(
+          "The workspace folder {0} was not found.",
+          workspaceFolderPath,
+        ),
+      );
+    }
+
+    return path.normalize(
+      path.resolve(explicitWorkspaceFolder.uri.fsPath, filePath),
+    );
+  }
+
+  if (workspaceFolders.length === 0) {
     throw new Error(
       vscode.l10n.t(
         "A workspace folder is required when using a relative file path.",
@@ -66,7 +98,38 @@ export function resolveFilePath(filePath: string): string {
     );
   }
 
-  return path.normalize(path.resolve(workspaceFolder.uri.fsPath, filePath));
+  if (workspaceFolders.length === 1) {
+    return path.normalize(
+      path.resolve(workspaceFolders[0].uri.fsPath, filePath),
+    );
+  }
+
+  const candidatePaths = workspaceFolders.map((folder) =>
+    path.normalize(path.resolve(folder.uri.fsPath, filePath)),
+  );
+  const existingCandidates = candidatePaths.filter((candidate) =>
+    fs.existsSync(candidate),
+  );
+
+  if (existingCandidates.length === 1) {
+    return existingCandidates[0];
+  }
+
+  if (existingCandidates.length > 1) {
+    throw new Error(
+      vscode.l10n.t(
+        "The relative file path {0} matches multiple workspace folders. Use an absolute path or provide workspaceFolderPath.",
+        filePath,
+      ),
+    );
+  }
+
+  throw new Error(
+    vscode.l10n.t(
+      "The relative file path {0} could not be resolved in a multi-root workspace. Use an absolute path or provide workspaceFolderPath.",
+      filePath,
+    ),
+  );
 }
 
 /**
@@ -183,10 +246,7 @@ export function snapshotBreakpoint(
 ): BreakpointSnapshot {
   if (breakpoint instanceof vscode.SourceBreakpoint) {
     const filePath = breakpoint.location.uri.fsPath;
-    const workspaceRelativePath = vscode.workspace.asRelativePath(
-      breakpoint.location.uri,
-      false,
-    );
+    const workspaceRelativePath = getWorkspaceRelativePath(filePath);
 
     return {
       key: createBreakpointKey({
@@ -254,8 +314,11 @@ export function listBreakpoints(): BreakpointSnapshot[] {
  */
 export function findSourceBreakpointsInFile(
   filePath: string,
+  workspaceFolderPath?: string,
 ): vscode.SourceBreakpoint[] {
-  const targetFilePath = normalizeFilePath(resolveFilePath(filePath));
+  const targetFilePath = normalizeFilePath(
+    resolveFilePath(filePath, workspaceFolderPath),
+  );
 
   return vscode.debug.breakpoints.filter(
     (breakpoint): breakpoint is vscode.SourceBreakpoint =>
@@ -300,7 +363,9 @@ export function findMatchingBreakpoints(
     );
   }
 
-  const targetFilePath = normalizeFilePath(resolveFilePath(input.filePath));
+  const targetFilePath = normalizeFilePath(
+    resolveFilePath(input.filePath, input.workspaceFolderPath),
+  );
   const targetLine = input.line;
   const targetColumn = input.column;
 
@@ -327,6 +392,41 @@ export function findMatchingBreakpoints(
         ? breakpointColumn === targetColumn
         : true;
     },
+  );
+}
+
+/**
+ * Resolve the relative workspace path for an absolute file path when possible.
+ *
+ * @param filePath Absolute file path.
+ * @returns The workspace-relative path or undefined when the file does not belong to a workspace folder.
+ */
+export function getWorkspaceRelativePath(filePath: string): string | undefined {
+  const workspaceFolder = vscode.workspace.getWorkspaceFolder(
+    vscode.Uri.file(filePath),
+  );
+
+  if (!workspaceFolder) {
+    return undefined;
+  }
+
+  return path.normalize(path.relative(workspaceFolder.uri.fsPath, filePath));
+}
+
+/**
+ * Find a workspace folder by its absolute path.
+ *
+ * @param workspaceFolderPath Workspace folder path.
+ * @returns The matching workspace folder.
+ */
+function findWorkspaceFolderByPath(
+  workspaceFolderPath: string,
+): vscode.WorkspaceFolder | undefined {
+  const normalizedTargetPath = normalizeFilePath(workspaceFolderPath);
+
+  return vscode.workspace.workspaceFolders?.find(
+    (workspaceFolder) =>
+      normalizeFilePath(workspaceFolder.uri.fsPath) === normalizedTargetPath,
   );
 }
 

@@ -355,7 +355,16 @@ export async function findLaunchConfigurationByName(
 export async function startDebugLaunchConfiguration(
   input: StartDebugLaunchConfigurationInput,
 ): Promise<unknown> {
-  const workspaceFolder = resolveWorkspaceFolder(input.workspaceFolderPath);
+  let workspaceFolder = resolveWorkspaceFolder(input.workspaceFolderPath);
+
+  if (input.workspaceFolderPath && !workspaceFolder) {
+    throw new Error(
+      vscode.l10n.t(
+        "The workspace folder {0} was not found.",
+        input.workspaceFolderPath,
+      ),
+    );
+  }
 
   if (!workspaceFolder && !input.launchConfiguration) {
     throw new Error(
@@ -375,6 +384,10 @@ export async function startDebugLaunchConfiguration(
       input.launchName,
       input.workspaceFolderPath,
     );
+
+    if (!workspaceFolder && snapshot.workspaceFolderPath) {
+      workspaceFolder = resolveWorkspaceFolder(snapshot.workspaceFolderPath);
+    }
 
     nameOrConfiguration =
       snapshot.kind === "compound"

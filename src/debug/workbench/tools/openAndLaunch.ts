@@ -25,6 +25,7 @@ export function registerOpenDebugSourceFileTool(server: McpServerLike): void {
       ),
       inputSchema: z.object({
         filePath: z.string().min(1),
+        workspaceFolderPath: z.string().min(1).optional(),
         line: z.number().int().positive().optional(),
         column: z.number().int().positive().optional(),
       }),

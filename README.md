@@ -17,8 +17,9 @@
 
 1. 按 `Ctrl+Shift+P` 打开命令面板
 2. 输入 "Configure AI Agent MCP" 并执行
-3. 在弹出的选择框中勾选要配置的 agent（GitHub Copilot、Cline、Cursor）
+3. 在弹出的选择框中勾选要配置的 agent（Cline、Cursor）
 4. 点击确定，扩展会自动修改相应配置文件
+5. 需要查看当前 MCP endpoint、代理配置和调试状态时，可以直接执行 "Show MCP Diagnostics"
 
 ### 2. 在 Copilot 中使用断点工具
 
@@ -36,6 +37,14 @@
 
 - [中文工具文档](doc/mcp-tools.zh-cn.md)
 - [English Tool Documentation](doc/mcp-tools.en.md)
+
+### 4. 启动配置与多工作区
+
+`start_debug_launch_configuration` 支持多工作区场景下的配置选择。
+
+- 如果只打开了一个 workspace folder，可以直接按 `launchName` 或原始 `launchConfiguration` 启动。
+- 如果同时打开了多个 workspace folder，且不同根目录里存在同名的 launch 配置，需要额外传入 `workspaceFolderPath` 来指定目标工作区。
+- `list_debug_launch_configurations` 也支持传入 `workspaceFolderPath`，只查看某一个工作区文件夹下的 `launch.json` 配置。
 
 ## 开发环境要求
 

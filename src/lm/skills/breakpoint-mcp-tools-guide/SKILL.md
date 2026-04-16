@@ -45,10 +45,11 @@ Use this skill when explaining or choosing the extension's breakpoint MCP tools.
 ## Parameter rules
 
 - `filePath` may be absolute or workspace-relative.
+- When a tool accepts `workspaceFolderPath`, prefer it for relative paths in multi-root workspaces.
 - `functionName` applies only to function breakpoints.
 - `line` and `column` are 1-based.
 - `condition`, `hitCondition`, and `logMessage` may be set to `null` in `update_breakpoint` to clear the existing value.
-- Resolve relative paths against the first workspace folder.
+- Resolve relative paths against the matching workspace folder; if no explicit `workspaceFolderPath` is provided, the extension will try to infer a unique workspace folder or return an ambiguity error.
 - Do not invent parameters that are not present in the tool `inputSchema`.
 - The debug-session tools accept an optional `sessionId`; if omitted, they act on the active debug session.
 - Use `list_debug_sessions` first when you need to know which `sessionId` values are available.

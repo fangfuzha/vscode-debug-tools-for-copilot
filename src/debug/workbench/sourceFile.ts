@@ -1,6 +1,9 @@
 import * as vscode from "vscode";
 import { createTextResult } from "../../mcp/shared";
-import { resolveFilePath } from "../breakpoints/shared";
+import {
+  getWorkspaceRelativePath,
+  resolveFilePath,
+} from "../breakpoints/shared";
 import type { OpenDebugSourceFileInput } from "./shared";
 
 /**
@@ -12,7 +15,10 @@ import type { OpenDebugSourceFileInput } from "./shared";
 export async function openDebugSourceFile(
   input: OpenDebugSourceFileInput,
 ): Promise<unknown> {
-  const resolvedFilePath = resolveFilePath(input.filePath);
+  const resolvedFilePath = resolveFilePath(
+    input.filePath,
+    input.workspaceFolderPath,
+  );
   const document = await vscode.workspace.openTextDocument(
     vscode.Uri.file(resolvedFilePath),
   );
@@ -34,10 +40,7 @@ export async function openDebugSourceFile(
 
   return createTextResult({
     filePath: resolvedFilePath,
-    workspaceRelativePath: vscode.workspace.asRelativePath(
-      vscode.Uri.file(resolvedFilePath),
-      false,
-    ),
+    workspaceRelativePath: getWorkspaceRelativePath(resolvedFilePath),
     line: targetLine,
     column: targetColumn,
     opened: true,

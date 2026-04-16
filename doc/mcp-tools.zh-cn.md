@@ -20,7 +20,7 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 - `start_debugging`：优先启动指定的 launch 配置；如果没有匹配项，则根据文件路径自动生成默认配置。
 - `get_variables_values`：读取当前暂停帧的作用域变量。
 - 资源文档可通过 `debugmcp://docs/debug_instructions` 和 `debugmcp://docs/troubleshooting/<language>` 访问。
-- 当你需要写入或迁移支持的 agent 配置文件时，请通过命令面板执行 `Configure AI Agent MCP`，它会先打开二级多选菜单。
+- 当你需要写入或迁移支持的 agent 配置文件时，请通过命令面板执行 `Configure AI Agent MCP`，它会先打开二级多选菜单；当前仅支持 Cline 和 Cursor。
 - 已经配置过的 agent 会默认勾选，取消勾选后在确认时会被移除。
 - 如果配置文件里已经存在 `debugmcp` 条目，会直接在原位置更新，减少迁移成本。
 
@@ -35,7 +35,7 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 ### `list_breakpoints_in_file`
 
 - 输入字段：
-  - `filePath` (字符串，必填)：要列出断点的源文件路径，可以是绝对路径，也可以是相对于第一个工作区文件夹的相对路径。
+  - `filePath` (字符串，必填)：要列出断点的源文件路径，可以是绝对路径，也可以是相对于工作区文件夹的相对路径；在多工作区场景下，建议同时传入 `workspaceFolderPath` 以消除歧义。
 - 说明：列出指定文件中的所有源断点。
 - 输出：解析后的文件路径、工作区相对路径、数量以及匹配到的断点快照。
 
@@ -48,7 +48,7 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 ### `add_source_breakpoint`
 
 - 输入字段：
-  - `filePath` (字符串，必填)：要下断点的源文件路径，可以是绝对路径，也可以是相对于第一个工作区文件夹的相对路径；空字符串不合法。
+  - `filePath` (字符串，必填)：要下断点的源文件路径，可以是绝对路径，也可以是相对于工作区文件夹的相对路径；在多工作区场景下，建议同时传入 `workspaceFolderPath` 以消除歧义。空字符串不合法。
   - `line` (整数，必填)：断点所在行号，从 1 开始计数，不能为 0、负数或小数。
   - `column` (整数，可选)：断点所在列号，从 1 开始计数；不传时默认落在该行第 1 列。
   - `enabled` (布尔，可选)：新建断点是否立即启用；不传时默认 `true`。
@@ -121,7 +121,7 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 ### `set_breakpoints_enabled_in_file`
 
 - 输入字段：
-  - `filePath` (字符串，必填)：要批量处理的源文件路径，可以是绝对路径，也可以是相对于第一个工作区文件夹的相对路径。
+  - `filePath` (字符串，必填)：要批量处理的源文件路径，可以是绝对路径，也可以是相对于工作区文件夹的相对路径；在多工作区场景下，建议同时传入 `workspaceFolderPath` 以消除歧义。
   - `enabled` (布尔，必填)：目标状态，`true` 表示启用该文件中的所有源断点，`false` 表示全部禁用。
 - 说明：启用或禁用指定文件中的所有源断点。这个工具只影响 `source` 类型断点，不会修改函数断点或其他未知类型断点。
 
@@ -201,7 +201,7 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 ### `open_debug_source_file`
 
 - 输入字段：
-  - `filePath` (字符串，必填)：要切换到的源文件路径，可以是绝对路径，也可以是相对于第一个工作区文件夹的相对路径。
+  - `filePath` (字符串，必填)：要切换到的源文件路径，可以是绝对路径，也可以是相对于工作区文件夹的相对路径；在多工作区场景下，建议同时传入 `workspaceFolderPath` 以消除歧义。
   - `line` (整数，可选)：要聚焦的行号，从 1 开始。
   - `column` (整数，可选)：要聚焦的列号，从 1 开始。
 - 说明：在活动编辑器中打开并聚焦目标源文件，方便把调试上下文切到对应代码位置。
@@ -338,7 +338,8 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 
 ## 文件路径处理
 
-- `filePath` 可以是绝对路径，也可以是相对于第一个工作区文件夹的相对路径。
+- `filePath` 可以是绝对路径，也可以是相对于工作区文件夹的相对路径。
+- 如果传入了 `workspaceFolderPath`，它会作为相对路径的基准目录。
 - 如果未打开工作区文件夹，则相对路径会被拒绝并抛出错误，因为无法判断相对路径的基准目录。
 - 比较时会对路径进行标准化，在 Windows 上还会统一小写，以避免大小写差异导致的误判。
 - 建议在自动化调用时优先传绝对路径，只有在明确知道工作区结构时再传相对路径。
@@ -346,5 +347,5 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 ## 说明
 
 - MCP 工具直接操作 VS Code 调试器的断点集合，因此对断点的增删改会立即反映到 VS Code 的调试视图中。
-- 相对路径按第一个工作区文件夹解析，多个工作区时不会自动遍历所有工作区文件夹。
+- 相对路径会优先按 `workspaceFolderPath` 解析；如果未提供该参数，扩展会在多工作区中尝试唯一匹配，否则抛出歧义错误。
 - 如果没有匹配到断点，工具会返回空结果集，不会报错；如果参数本身不合法，则会抛出错误。

@@ -17,7 +17,7 @@ interface AgentTarget {
 /**
  * Runtime state for one agent configuration target.
  */
-interface AgentTargetState {
+export interface AgentTargetState {
   target: AgentTarget;
   configured: boolean;
   entryName?: string;
@@ -170,7 +170,7 @@ export async function syncAgentConfigurations(
  *
  * @returns Agent states used to pre-check the picker.
  */
-async function inspectAgentTargets(): Promise<AgentTargetState[]> {
+export async function inspectAgentTargets(): Promise<AgentTargetState[]> {
   return getSupportedAgentTargets().map((target) => {
     const rootConfig = readJsonFile(target.configPath);
 

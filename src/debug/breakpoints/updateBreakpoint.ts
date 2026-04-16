@@ -22,6 +22,7 @@ export function registerUpdateBreakpointTool(server: McpServerLike): void {
         .object({
           key: z.string().min(1).optional(),
           filePath: z.string().min(1).optional(),
+          workspaceFolderPath: z.string().min(1).optional(),
           line: z.number().int().positive().optional(),
           column: z.number().int().positive().optional(),
           functionName: z.string().min(1).optional(),

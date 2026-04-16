@@ -3,6 +3,7 @@ import * as z from "zod/v4";
 import { createTextResult, McpServerLike } from "../../mcp/shared";
 import {
   findSourceBreakpointsInFile,
+  getWorkspaceRelativePath,
   resolveFilePath,
   snapshotBreakpoint,
 } from "./shared";
@@ -19,20 +20,22 @@ export function registerListBreakpointsInFileTool(server: McpServerLike): void {
       ),
       inputSchema: z.object({
         filePath: z.string().min(1),
+        workspaceFolderPath: z.string().min(1).optional(),
       }),
     },
-    async (input: { filePath: string }) => {
-      const resolvedFilePath = resolveFilePath(input.filePath);
-      const breakpoints = findSourceBreakpointsInFile(input.filePath).map(
-        snapshotBreakpoint,
+    async (input: { filePath: string; workspaceFolderPath?: string }) => {
+      const resolvedFilePath = resolveFilePath(
+        input.filePath,
+        input.workspaceFolderPath,
       );
+      const breakpoints = findSourceBreakpointsInFile(
+        input.filePath,
+        input.workspaceFolderPath,
+      ).map(snapshotBreakpoint);
 
       return createTextResult({
         filePath: resolvedFilePath,
-        workspaceRelativePath: vscode.workspace.asRelativePath(
-          vscode.Uri.file(resolvedFilePath),
-          false,
-        ),
+        workspaceRelativePath: getWorkspaceRelativePath(resolvedFilePath),
         count: breakpoints.length,
         results: breakpoints,
       });
