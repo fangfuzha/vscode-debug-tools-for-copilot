@@ -36,12 +36,21 @@
         "command": "debugtools.add-mcp-to-agent",
         "title": "%debugtools.add-mcp-to-agent%",
         "category": "%VS Code Debug Tools%"
+      },
+      {
+        "command": "debugtools.show-mcp-diagnostics",
+        "title": "%debugtools.show-mcp-diagnostics%",
+        "category": "%VS Code Debug Tools%"
       }
     ],
     "menus": {
       "commandPalette": [
         {
           "command": "debugtools.add-mcp-to-agent",
+          "when": "true"
+        },
+        {
+          "command": "debugtools.show-mcp-diagnostics",
           "when": "true"
         }
       ]

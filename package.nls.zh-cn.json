@@ -4,5 +4,7 @@
   "mcp.breakpointProvider.label": "VS Code 调试工具 for Copilot",
   "Configure AI Agent MCP": "配置 AI 代理 MCP",
   "debugtools.add-mcp-to-agent": "配置 AI 代理 MCP",
+  "Show MCP Diagnostics": "显示 MCP 诊断",
+  "debugtools.show-mcp-diagnostics": "显示 MCP 诊断",
   "VS Code Debug Tools": "VS Code 调试工具"
 }

@@ -4,5 +4,7 @@
   "mcp.breakpointProvider.label": "VS Code Debug Tools for Copilot",
   "Configure AI Agent MCP": "Configure AI Agent MCP",
   "debugtools.add-mcp-to-agent": "Configure AI Agent MCP",
+  "Show MCP Diagnostics": "Show MCP Diagnostics",
+  "debugtools.show-mcp-diagnostics": "Show MCP Diagnostics",
   "VS Code Debug Tools": "VS Code Debug Tools"
 }

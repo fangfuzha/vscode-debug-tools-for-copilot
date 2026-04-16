@@ -19,6 +19,7 @@ export function registerAddSourceBreakpointTool(server: McpServerLike): void {
       ),
       inputSchema: z.object({
         filePath: z.string().min(1),
+        workspaceFolderPath: z.string().min(1).optional(),
         line: z.number().int().positive(),
         column: z.number().int().positive().optional(),
         enabled: z.boolean().optional(),
@@ -29,6 +30,7 @@ export function registerAddSourceBreakpointTool(server: McpServerLike): void {
     },
     async (input: {
       filePath: string;
+      workspaceFolderPath?: string;
       line: number;
       column?: number;
       enabled?: boolean;
@@ -37,7 +39,9 @@ export function registerAddSourceBreakpointTool(server: McpServerLike): void {
       logMessage?: string;
     }) => {
       const location = new vscode.Location(
-        vscode.Uri.file(resolveFilePath(input.filePath)),
+        vscode.Uri.file(
+          resolveFilePath(input.filePath, input.workspaceFolderPath),
+        ),
         new vscode.Position(input.line - 1, (input.column ?? 1) - 1),
       );
 

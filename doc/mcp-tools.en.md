@@ -20,7 +20,7 @@ The extension also exposes a small compatibility layer so existing DebugMCP-styl
 - `start_debugging`: starts from a named launch configuration or falls back to an auto-generated configuration from the file path.
 - `get_variables_values`: inspects the current paused frame and returns scope variables.
 - Resources are available under `debugmcp://docs/debug_instructions` and `debugmcp://docs/troubleshooting/<language>`.
-- Use the command palette action `Configure AI Agent MCP` to open a second-level multi-select picker.
+- Use the command palette action `Configure AI Agent MCP` to open a second-level multi-select picker for the currently supported agents, Cline and Cursor.
 - Existing configured agents are pre-checked, and unchecking them removes their agent entry when you confirm.
 - Existing `debugmcp` entries are updated in place when they are already present.
 
@@ -35,7 +35,7 @@ The extension also exposes a small compatibility layer so existing DebugMCP-styl
 ### `list_breakpoints_in_file`
 
 - Input fields:
-  - `filePath` (string, required): the file whose source breakpoints should be listed. It can be absolute or relative to the first workspace folder.
+  - `filePath` (string, required): the file whose source breakpoints should be listed. It can be absolute or relative to a workspace folder; in multi-root workspaces, pass `workspaceFolderPath` to remove ambiguity.
 - Description: List all source breakpoints in one file.
 - Output: the resolved file path, workspace-relative path, count, and matching breakpoint snapshots.
 
@@ -48,7 +48,7 @@ The extension also exposes a small compatibility layer so existing DebugMCP-styl
 ### `add_source_breakpoint`
 
 - Input fields:
-  - `filePath` (string, required): the source file path to break on. It can be absolute or relative to the first workspace folder. An empty string is invalid.
+  - `filePath` (string, required): the source file path to break on. It can be absolute or relative to a workspace folder; in multi-root workspaces, pass `workspaceFolderPath` to remove ambiguity. An empty string is invalid.
   - `line` (integer, required): the target line number, counted from 1. Zero, negative numbers, and decimals are invalid.
   - `column` (integer, optional): the target column number, counted from 1. If omitted, the breakpoint defaults to column 1 on that line.
   - `enabled` (boolean, optional): whether the new breakpoint should be enabled immediately. Defaults to `true`.
@@ -125,7 +125,7 @@ The extension also exposes a small compatibility layer so existing DebugMCP-styl
 ### `set_breakpoints_enabled_in_file`
 
 - Input fields:
-  - `filePath` (string, required): the source file to update. It can be absolute or relative to the first workspace folder.
+  - `filePath` (string, required): the source file to update. It can be absolute or relative to a workspace folder; in multi-root workspaces, pass `workspaceFolderPath` to remove ambiguity.
   - `enabled` (boolean, required): the target state. `true` enables every source breakpoint in that file; `false` disables them.
 - Description: Enable or disable every source breakpoint in the specified file. This tool only affects `source` breakpoints; it does not change function breakpoints or unknown breakpoint types.
 
@@ -205,7 +205,7 @@ The extension also exposes a small compatibility layer so existing DebugMCP-styl
 ### `open_debug_source_file`
 
 - Input fields:
-  - `filePath` (string, required): the source file path to focus. It can be absolute or relative to the first workspace folder.
+  - `filePath` (string, required): the source file path to focus. It can be absolute or relative to a workspace folder; in multi-root workspaces, pass `workspaceFolderPath` to remove ambiguity.
   - `line` (integer, optional): the 1-based line number to focus.
   - `column` (integer, optional): the 1-based column number to focus.
 - Description: Open a source file in the active editor and focus it so you can jump the debug context to the right code location.
@@ -342,7 +342,8 @@ The descriptor includes the fields that define breakpoint identity, such as `kin
 
 ## File path handling
 
-- `filePath` can be either absolute or relative to the first workspace folder.
+- `filePath` can be either absolute or relative to a workspace folder.
+- If `workspaceFolderPath` is provided, it is used as the base for relative paths.
 - If the workspace is not open, relative paths are rejected because there is no base folder to resolve against.
 - Paths are normalized for comparison, and on Windows normalization also converts to lowercase to avoid mismatches caused by case differences.
 - For automation, absolute paths are preferred unless you intentionally want workspace-relative behavior.
@@ -350,6 +351,6 @@ The descriptor includes the fields that define breakpoint identity, such as `kin
 ## Notes
 
 - The MCP tools operate directly on the VS Code debugger breakpoint set.
-- Relative paths are resolved against the first workspace folder only; multiple workspace folders are not searched automatically.
+- Relative paths are resolved using `workspaceFolderPath` when provided; otherwise the extension tries to infer a unique matching workspace folder in multi-root workspaces and throws an ambiguity error when it cannot.
 - If no matching breakpoints are found, the tools return an empty result set.
 - If the input itself is invalid, the tool throws an error instead of returning an empty result.

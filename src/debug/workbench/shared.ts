@@ -39,6 +39,7 @@ export interface StartDebugLaunchConfigurationInput {
  */
 export interface OpenDebugSourceFileInput {
   filePath: string;
+  workspaceFolderPath?: string;
   line?: number;
   column?: number;
 }
@@ -164,8 +165,11 @@ export function normalizeWorkspacePath(filePath: string): string {
 /**
  * Resolve a workspace folder by absolute path when provided.
  *
+ * When no path is provided, the single open workspace folder is returned. In a
+ * multi-root workspace, undefined is returned so the caller can disambiguate.
+ *
  * @param workspaceFolderPath Workspace folder path.
- * @returns The matching workspace folder or the first workspace folder.
+ * @returns The matching workspace folder or undefined when the path cannot be resolved.
  */
 export function resolveWorkspaceFolder(
   workspaceFolderPath?: string,
@@ -173,7 +177,7 @@ export function resolveWorkspaceFolder(
   const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
 
   if (!workspaceFolderPath) {
-    return workspaceFolders[0];
+    return workspaceFolders.length === 1 ? workspaceFolders[0] : undefined;
   }
 
   const normalizedTargetPath = normalizeWorkspacePath(workspaceFolderPath);

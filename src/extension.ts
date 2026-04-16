@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { promptAndApplyAgentConfigurations } from "./mcp/agentConfig";
+import { disposeMcpDiagnostics, showMcpDiagnostics } from "./mcp/diagnostics";
 import {
   registerBreakpointMcpSupport,
   getBreakpointMcpEndpoint,
@@ -56,7 +57,14 @@ function registerCommands(context: vscode.ExtensionContext) {
     },
   );
 
-  context.subscriptions.push(configureAgentsCommand);
+  const showDiagnosticsCommand = vscode.commands.registerCommand(
+    "debugtools.show-mcp-diagnostics",
+    async () => {
+      await showMcpDiagnostics(context);
+    },
+  );
+
+  context.subscriptions.push(configureAgentsCommand, showDiagnosticsCommand);
 }
 
 /**
@@ -65,5 +73,6 @@ function registerCommands(context: vscode.ExtensionContext) {
  * 该函数的主要作用是清理插件在运行期间创建的资源，避免资源泄漏。
  */
 export function deactivate() {
+  disposeMcpDiagnostics();
   logger.info(vscode.l10n.t("Extension deactivated."));
 }
