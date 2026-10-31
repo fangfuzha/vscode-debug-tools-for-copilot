@@ -9,6 +9,17 @@
     "url": "https://github.com/fangfuzha/vscode-debug-tools-for-copilot.git"
   },
   "license": "MIT",
+  "files": [
+    "out/**",
+    "src/lm/skills/**",
+    "l10n/**",
+    "syntaxes/**",
+    "icon.png",
+    "language-configuration.json",
+    "package.nls*.json",
+    "README*.md",
+    "LICENSE.md"
+  ],
   "keywords": [
     "调试",
     "debug",
