@@ -27,7 +27,7 @@
     "agent"
   ],
   "engines": {
-    "vscode": "^1.115.0"
+    "vscode": "^1.144.0"
   },
   "l10n": "./l10n",
   "activationEvents": [
@@ -146,10 +146,10 @@
     ]
   },
   "dependencies": {
-    "@cfworker/json-schema": "^4.1.1",
-    "@modelcontextprotocol/node": "^2.0.0-alpha.2",
-    "@modelcontextprotocol/server": "^2.0.0-alpha.2",
-    "zod": "^4.3.6"
+    "@cfworker/json-schema": "^4.1.4",
+    "@modelcontextprotocol/node": "^2.1.2",
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.6.7"
   },
   "scripts": {
     "compile": "tsc -p ./",
@@ -160,15 +160,16 @@
     "package": "npm run bundle && npx @vscode/vsce package"
   },
   "devDependencies": {
-    "esbuild": "^0.19.4",
-    "@types/glob": "^8.1.0",
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^20.10.6",
-    "@types/vscode": "^1.115.0",
-    "@typescript-eslint/eslint-plugin": "^6.20.0",
-    "@typescript-eslint/parser": "^6.20.0",
-    "@vscode/test-electron": "^2.4.6",
-    "eslint": "^8.56.0",
-    "typescript": "5.3.2"
+    "@eslint/js": "^10.0.1",
+    "esbuild": "^0.28.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.6.6",
+    "@types/vscode": "^1.144.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
+    "@vscode/test-electron": "^3.1.0",
+    "eslint": "^10.14.0",
+    "globals": "^17.13.0",
+    "typescript": "^5.9.3"
   }
 }
