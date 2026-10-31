@@ -8,6 +8,9 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -27,5 +30,3 @@ jobs:
 
       - name: Publish to VS Code Marketplace
         run: npx @vscode/vsce publish --packagePath vscode-debug-tools-for-copilot-*.vsix
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}

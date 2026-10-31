@@ -119,23 +119,35 @@ These documents include the full tool list, input structures, return values, mat
 
 ## Packaging and release
 
-1. **Install the vsce tool**
+1. **Configure Marketplace Trusted Publishing**
+
+   Create a Trusted Publishing policy in the Visual Studio Marketplace publisher settings and bind it to:
+
+   - GitHub owner: `fangfuzha`
+   - Repository: `vscode-debug-tools-for-copilot`
+   - Workflow file: `publish.yml`
+
+   The workflow uses GitHub Actions OIDC and does not require a long-lived `VSCE_PAT`.
+
+2. **Install the vsce tool**
 
    ```sh
    npm install -g vsce
    ```
 
-2. **Package the extension**
+3. **Package the extension**
 
    ```sh
    vsce package
    ```
 
-3. **Publish to the Marketplace**
+4. **Publish to the Marketplace**
 
    ```sh
    vsce publish
    ```
+
+   CI publishing authenticates through GitHub Actions OIDC.
 
 ## Development tips
 

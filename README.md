@@ -116,23 +116,35 @@ Copilot skill 也随扩展提供，用来帮助 Copilot 选择正确的断点和
 
 ## 打包与发布
 
-1. **安装 vsce 工具**
+1. **准备 Marketplace Trusted Publishing**
+
+   在 Visual Studio Marketplace 的发布者设置中创建 Trusted Publishing 策略，绑定：
+
+   - GitHub 用户或组织：`fangfuzha`
+   - 仓库：`vscode-debug-tools-for-copilot`
+   - 工作流文件：`publish.yml`
+
+   该工作流使用 GitHub Actions 的 OIDC，不需要保存长期有效的 `VSCE_PAT`。
+
+2. **安装 vsce 工具**
 
    ```sh
    npm install -g vsce
    ```
 
-2. **打包插件**
+3. **打包插件**
 
    ```sh
    vsce package
    ```
 
-3. **发布到市场**
+4. **发布到市场**
 
    ```sh
    vsce publish
    ```
+
+   CI 发布时会由 GitHub Actions 使用 OIDC 自动完成认证。
 
 ## 开发提示
 
