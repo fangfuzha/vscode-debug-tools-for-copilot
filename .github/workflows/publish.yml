@@ -29,4 +29,4 @@ jobs:
         run: npm run package
 
       - name: Publish to VS Code Marketplace
-        run: npx @vscode/vsce publish --packagePath vscode-debug-tools-for-copilot-*.vsix
+        run: npx @vscode/vsce publish --packagePath vscode-debug-tools-for-copilot-*.vsix --oidc
