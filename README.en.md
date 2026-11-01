@@ -58,7 +58,7 @@ These documents include the full tool list, input structures, return values, mat
 
 ## Development requirements
 
-- Node.js 20.x or later
+- Node.js 22.x or later (`@vscode/vsce` requires Node >= 22)
 - VS Code 1.115.0 or later
 
 ## Build and run
@@ -129,22 +129,24 @@ These documents include the full tool list, input structures, return values, mat
 
    The workflow uses GitHub Actions OIDC and does not require a long-lived `VSCE_PAT`.
 
-2. **Install the vsce tool**
+2. **Install the dependencies**
 
    ```sh
-   npm install -g vsce
+   npm ci
    ```
+
+   `vsce` is pinned as a devDependency in [package.json](package.json), so there is no separate install step.
 
 3. **Package the extension**
 
    ```sh
-   vsce package
+   npm run package
    ```
 
 4. **Publish to the Marketplace**
 
    ```sh
-   vsce publish
+   npx --no-install vsce publish
    ```
 
    CI publishing authenticates through GitHub Actions OIDC.

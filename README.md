@@ -56,7 +56,7 @@ Copilot skill 也随扩展提供，用来帮助 Copilot 选择正确的断点和
 
 ## 开发环境要求
 
-- Node.js 20.x 或更高版本
+- Node.js 22.x 或更高版本（`@vscode/vsce` 要求 Node >= 22）
 - VS Code 1.115.0 或更高版本
 
 ## 编译与运行
@@ -126,22 +126,24 @@ Copilot skill 也随扩展提供，用来帮助 Copilot 选择正确的断点和
 
    该工作流使用 GitHub Actions 的 OIDC，不需要保存长期有效的 `VSCE_PAT`。
 
-2. **安装 vsce 工具**
+2. **安装依赖**
 
    ```sh
-   npm install -g vsce
+   npm ci
    ```
+
+   `vsce` 已作为 devDependency 固定在 [package.json](package.json) 中，无需单独安装。
 
 3. **打包插件**
 
    ```sh
-   vsce package
+   npm run package
    ```
 
 4. **发布到市场**
 
    ```sh
-   vsce publish
+   npx --no-install vsce publish
    ```
 
    CI 发布时会由 GitHub Actions 使用 OIDC 自动完成认证。

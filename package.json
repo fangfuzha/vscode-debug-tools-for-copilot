@@ -97,19 +97,24 @@
     "watch": "tsc -watch -p ./",
     "test": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "package": "npm run bundle && npx @vscode/vsce package"
+    "package": "npm run bundle && vsce package"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "esbuild": "^0.28.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.6.6",
     "@types/vscode": "^1.144.0",
     "@typescript-eslint/eslint-plugin": "^8.72.1",
     "@typescript-eslint/parser": "^8.72.1",
     "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "4.1.0",
+    "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "globals": "^17.13.0",
     "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "esbuild": true,
+    "@vscode/vsce-sign": true
   }
 }
