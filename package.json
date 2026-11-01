@@ -11,9 +11,9 @@
   "license": "MIT",
   "files": [
     "out/**",
-    "src/lm/skills/**",
+    "skills/**",
+    "assets/**",
     "l10n/**",
-    "icon.png",
     "package.nls*.json",
     "README*.md",
     "LICENSE.md"
@@ -37,7 +37,7 @@
     "Chat",
     "Debuggers"
   ],
-  "icon": "icon.png",
+  "icon": "assets/icon.png",
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -75,7 +75,7 @@
     },
     "chatSkills": [
       {
-        "path": "./src/lm/skills/vscode-debug-tools-guide/SKILL.md"
+        "path": "./skills/vscode-debug-tools-guide/SKILL.md"
       }
     ],
     "mcpServerDefinitionProviders": [

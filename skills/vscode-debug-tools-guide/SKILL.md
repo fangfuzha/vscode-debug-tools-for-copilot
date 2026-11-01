@@ -9,8 +9,8 @@ Use this skill when explaining or choosing the extension's breakpoint MCP tools.
 
 For installation, configuration, and user-facing usage, see the main README first:
 
-- 中文说明: [README.md](../../../../README.md)
-- English guide: [README.en.md](../../../../README.en.md)
+- 中文说明: [README.md](../../README.md)
+- English guide: [README.en.md](../../README.en.md)
 
 This skill only covers tool selection, parameter rules, and Copilot-side guidance after the extension has been configured.
 
@@ -84,6 +84,6 @@ This skill only covers tool selection, parameter rules, and Copilot-side guidanc
 
 ## Reference
 
-- User guide: [README.md](../../../../README.md) / [README.en.md](../../../../README.en.md)
-- 中文说明: [doc/mcp-tools.zh-cn.md](../../../../doc/mcp-tools.zh-cn.md)
-- English guide: [doc/mcp-tools.en.md](../../../../doc/mcp-tools.en.md)
+- User guide: [README.md](../../README.md) / [README.en.md](../../README.en.md)
+- 中文说明: [doc/mcp-tools.zh-cn.md](../../doc/mcp-tools.zh-cn.md)
+- English guide: [doc/mcp-tools.en.md](../../doc/mcp-tools.en.md)
