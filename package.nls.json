@@ -4,6 +4,7 @@
   "mcp.debugToolsProvider.label": "VS Code Debug Tools for Copilot",
   "debugtools.show-mcp-diagnostics": "Show MCP Diagnostics",
   "debugtools.export-mcp-configuration": "Export MCP Configuration",
+  "debugtools.icon.debugAgent.description": "Icon for the debug tools entry in the status bar.",
   "VS Code Debug Tools": "VS Code Debug Tools",
   "vscodeDebugTools.mcpPort.description": "The TCP port used by the local MCP server. Set it to 0 to let the extension pick a port automatically and keep it stable across restarts."
 }

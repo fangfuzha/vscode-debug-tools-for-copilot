@@ -4,6 +4,7 @@
   "mcp.debugToolsProvider.label": "VS Code 调试工具 for Copilot",
   "debugtools.show-mcp-diagnostics": "显示 MCP 诊断",
   "debugtools.export-mcp-configuration": "导出 MCP 配置",
+  "debugtools.icon.debugAgent.description": "状态栏中调试工具入口的图标。",
   "VS Code Debug Tools": "VS Code 调试工具",
   "vscodeDebugTools.mcpPort.description": "本地 MCP 服务使用的 TCP 端口。设为 0 时由扩展自动选择，并尽量在重启后保持不变。"
 }

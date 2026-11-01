@@ -49,7 +49,7 @@ export function registerExtensionStatusBar(
     vscode.StatusBarAlignment.Right,
     100,
   );
-  statusBarItem.text = "$(debug-alt)";
+  statusBarItem.text = "$(debugtools-debug-agent)";
   statusBarItem.tooltip = vscode.l10n.t(
     "VS Code Debug Tools for Copilot commands",
   );

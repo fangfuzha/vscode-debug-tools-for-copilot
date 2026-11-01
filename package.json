@@ -1,7 +1,7 @@
 {
   "name": "vscode-debug-tools-for-copilot",
   "displayName": "%displayName%",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "%description%",
   "publisher": "fangfuzha",
   "repository": {
@@ -52,6 +52,15 @@
         "category": "%VS Code Debug Tools%"
       }
     ],
+    "icons": {
+      "debugtools-debug-agent": {
+        "description": "%debugtools.icon.debugAgent.description%",
+        "default": {
+          "fontPath": "./assets/fonts/debug-tools.woff",
+          "fontCharacter": "\\E001"
+        }
+      }
+    },
     "configuration": {
       "title": "%displayName%",
       "properties": {
@@ -104,6 +113,7 @@
     "l10n:check": "node scripts/l10n-check.js",
     "l10n:xlf": "node scripts/l10n-xlf.js",
     "l10n:import": "node scripts/l10n-import.js",
+    "icon:font": "node scripts/build-icon-font.js",
     "package": "npm run bundle && vsce package"
   },
   "devDependencies": {
@@ -119,6 +129,9 @@
     "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "globals": "^17.13.0",
+    "svg2ttf": "^6.1.0",
+    "svgicons2svgfont": "^16.0.0",
+    "ttf2woff": "^3.0.0",
     "typescript": "^5.9.3"
   },
   "allowScripts": {
