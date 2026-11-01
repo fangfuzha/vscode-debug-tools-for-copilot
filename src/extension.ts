@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { disposeMcpDiagnostics, showMcpDiagnostics } from "./mcp/diagnostics";
 import { showMcpConfigurationExport } from "./mcp/exportConfiguration";
 import { registerBreakpointMcpSupport } from "./mcp/server";
+import { registerExtensionStatusBar } from "./statusBar";
 import { logger } from "./logger";
 
 /**
@@ -14,6 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
   logger.logEnvironment();
 
   context.subscriptions.push(registerBreakpointMcpSupport(context));
+  context.subscriptions.push(registerExtensionStatusBar(context));
   registerCommands(context);
 }
 

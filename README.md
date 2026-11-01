@@ -50,6 +50,7 @@ Copilot Chat 通过 VS Code 原生的 MCP 集成使用本扩展的服务，不�
 
 ### 查看状态与导出配置
 
+- 状态栏右侧的调试图标是本扩展的入口：点击后列出扩展提供的所有命令，选中即可执行。
 - `显示 MCP 诊断`：在 "VS Code Debug Tools" 输出面板中打印当前 endpoint、端口及其来源、断点数量、调试会话数量等，并可一键复制 endpoint。
 - `导出 MCP 配置`：生成可复制的 JSON 片段，可选择通用 server 条目、VS Code `mcp.json`（`servers` 包装）或通用 `mcpServers` 包装三种格式，用于配置其他 MCP 客户端。
 

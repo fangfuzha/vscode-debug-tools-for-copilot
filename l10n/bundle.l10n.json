@@ -1,4 +1,9 @@
 {
+  "Show MCP Diagnostics": "Show MCP Diagnostics",
+  "Export MCP Configuration": "Export MCP Configuration",
+  "VS Code Debug Tools for Copilot commands": "VS Code Debug Tools for Copilot commands",
+  "This extension does not contribute any command.": "This extension does not contribute any command.",
+  "Choose a command to run.": "Choose a command to run.",
   "VS Code Debug Tools": "VS Code Debug Tools",
   "Extension activated.": "Extension activated.",
   "Extension deactivated.": "Extension deactivated.",
@@ -7,7 +12,6 @@
   "MCP server error": "MCP server error",
   "Failed to determine the MCP server port.": "Failed to determine the MCP server port.",
   "Failed to export MCP configuration: {0}": "Failed to export MCP configuration: {0}",
-  "Export MCP Configuration": "Export MCP Configuration",
   "Choose a configuration profile to export.": "Choose a configuration profile to export.",
   "VS Code Debug Tools for Copilot diagnostics": "VS Code Debug Tools for Copilot diagnostics",
   "Copy Endpoint": "Copy Endpoint",

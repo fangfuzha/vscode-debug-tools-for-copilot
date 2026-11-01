@@ -50,6 +50,7 @@ The service address looks like `http://127.0.0.1:<port>`. The extension keeps th
 
 ### Inspecting state and exporting configuration
 
+- The debug icon on the right side of the status bar is this extension's entry point: click it to list every command the extension provides, then pick one to run.
 - `Show MCP Diagnostics` writes the current endpoint, the port and where it came from, breakpoint count, debug session count, and more to the "VS Code Debug Tools" output channel, with a shortcut to copy the endpoint.
 - `Export MCP Configuration` generates a reusable JSON snippet in one of three shapes: a generic server entry, the VS Code `mcp.json` layout (`servers` wrapper), or the common `mcpServers` wrapper — useful for any other MCP-compatible client.
 
