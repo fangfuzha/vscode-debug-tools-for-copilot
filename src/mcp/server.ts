@@ -30,8 +30,30 @@ const MCP_SERVER_NAME = "vscode-debug-tools-for-copilot";
 const MCP_SERVER_VERSION = "0.5.0";
 const MCP_PROVIDER_ID = "fangfuzha.vscode-debug-tools-for-copilot";
 
+/** 端口设置项：vscodeDebugTools.mcpPort。 */
+const CONFIG_SECTION = "vscodeDebugTools";
+const PORT_SETTING_ID = "mcpPort";
+
+/** 记录上次自动选中的端口，使端口在重启后尽量保持不变。 */
+const REMEMBERED_PORT_KEY = "debugTools.selectedMcpPort";
+
+/** 自动选端口时的候选区间。 */
+const AUTO_PORT_MIN = 3001;
+const AUTO_PORT_MAX = 3100;
+
+/**
+ * 端口的来源，用于诊断输出。
+ *
+ * - `setting`：用户在设置里显式指定；
+ * - `remembered`：沿用上次自动选中的端口；
+ * - `automatic`：本次新选出来的端口。
+ */
+export type McpPortSource = "setting" | "remembered" | "automatic";
+
 interface BreakpointMcpRuntime extends vscode.Disposable {
   readonly endpoint: string;
+  readonly port: number;
+  readonly portSource: McpPortSource;
 
   toServerDefinition(): vscode.McpHttpServerDefinition;
 }
@@ -88,9 +110,22 @@ export function registerBreakpointMcpSupport(
     void vscode.window.showErrorMessage(message);
   });
 
+  const portSettingListener = vscode.workspace.onDidChangeConfiguration(
+    (event) => {
+      if (
+        !event.affectsConfiguration(`${CONFIG_SECTION}.${PORT_SETTING_ID}`)
+      ) {
+        return;
+      }
+
+      void restartBreakpointMcpRuntime(context);
+    },
+  );
+
   const disposable = vscode.Disposable.from(
     providerDisposable,
     definitionsChanged,
+    portSettingListener,
   );
   context.subscriptions.push(disposable);
 
@@ -157,11 +192,21 @@ async function createBreakpointMcpRuntime(
     }
   });
 
-  const port = await listenOnLoopback(httpServer);
+  const { port, source: portSource } = await listenOnResolvedPort(
+    httpServer,
+    context,
+  );
   const endpoint = `http://${MCP_HOST}:${port}`;
+
+  // 绑定完成后保留一个长期错误处理器，避免运行期的 socket 错误变成未捕获异常。
+  httpServer.on("error", (error) => {
+    logger.error("MCP server error", error);
+  });
 
   return {
     endpoint,
+    port,
+    portSource,
     async dispose() {
       runtime = undefined;
       runtimePromise = undefined;
@@ -227,27 +272,142 @@ async function writeInternalServerError(
 }
 
 /**
- * 监听随机可用端口并返回端口号。
+ * 读取用户在设置里显式指定的端口。
+ *
+ * @returns 合法端口号；未配置或配置无效时返回 undefined。
+ */
+function getConfiguredPort(): number | undefined {
+  const configured = vscode.workspace
+    .getConfiguration(CONFIG_SECTION)
+    .get<number>(PORT_SETTING_ID);
+
+  if (typeof configured !== "number" || !Number.isInteger(configured)) {
+    return undefined;
+  }
+
+  if (!isValidPort(configured)) {
+    return undefined;
+  }
+
+  return configured;
+}
+
+/**
+ * 判断端口号是否可用。
+ *
+ * @param port 端口号。
+ * @returns 是否为合法端口号。
+ */
+function isValidPort(port: number): boolean {
+  return Number.isInteger(port) && port > 0 && port <= 65535;
+}
+
+/**
+ * 生成候选端口序列：随机起点 + 顺序递增。
+ *
+ * 随机起点避免总是抢占同一个端口，顺序递增保证占用冲突时按固定次序回退，
+ * 不会在候选区间里来回跳。
+ *
+ * @returns 候选端口列表。
+ */
+function buildOrderedRandomCandidates(): number[] {
+  const size = AUTO_PORT_MAX - AUTO_PORT_MIN + 1;
+  const start = Math.floor(Math.random() * size);
+  const candidates: number[] = [];
+
+  for (let offset = 0; offset < size; offset++) {
+    candidates.push(AUTO_PORT_MIN + ((start + offset) % size));
+  }
+
+  return candidates;
+}
+
+/**
+ * 尝试在指定端口上监听，端口不可用时返回 false。
  *
  * @param server HTTP 服务器。
- * @returns 已绑定端口号。
+ * @param port 目标端口，0 表示由操作系统分配。
+ * @returns 是否成功监听。
  */
-function listenOnLoopback(server: HttpServer): Promise<number> {
-  return new Promise((resolve, reject) => {
-    server.once("error", reject);
-    server.listen(0, MCP_HOST, () => {
-      const address = server.address();
-
-      if (typeof address === "object" && address && "port" in address) {
-        resolve(address.port);
-        return;
-      }
-
-      reject(
-        new Error(vscode.l10n.t("Failed to determine the MCP server port.")),
+function tryListen(server: HttpServer, port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const onError = (error: Error & { code?: string }): void => {
+      server.removeListener("listening", onListening);
+      logger.warn(
+        `MCP server port ${port} is unavailable: ${error.code ?? error.message}`,
       );
-    });
+      resolve(false);
+    };
+    const onListening = (): void => {
+      server.removeListener("error", onError);
+      resolve(true);
+    };
+
+    server.once("error", onError);
+    server.once("listening", onListening);
+    server.listen(port, MCP_HOST);
   });
+}
+
+/**
+ * 解析并绑定本地 MCP 服务监听的端口。
+ *
+ * 优先级：
+ * 1. 用户在 `vscodeDebugTools.mcpPort` 中显式配置的端口；
+ * 2. 上次成功绑定的端口（保存在 globalState），让端口尽量不频繁变化；
+ * 3. 候选区间内的有序随机端口；
+ * 4. 全部不可用时退回由操作系统分配。
+ *
+ * @param server HTTP 服务器。
+ * @param context 扩展上下文，用于读取和保存端口状态。
+ * @returns 已绑定的端口号及其来源。
+ */
+async function listenOnResolvedPort(
+  server: HttpServer,
+  context: vscode.ExtensionContext,
+): Promise<{ port: number; source: McpPortSource }> {
+  const configuredPort = getConfiguredPort();
+  if (configuredPort !== undefined) {
+    if (await tryListen(server, configuredPort)) {
+      logger.info(`MCP server is listening on the configured port ${configuredPort}.`);
+      return { port: configuredPort, source: "setting" };
+    }
+
+    logger.warn(
+      `The configured MCP port ${configuredPort} is unavailable, falling back to automatic selection.`,
+    );
+  }
+
+  const rememberedPort = context.globalState.get<number>(REMEMBERED_PORT_KEY);
+  if (typeof rememberedPort === "number" && isValidPort(rememberedPort)) {
+    if (await tryListen(server, rememberedPort)) {
+      logger.info(`MCP server is reusing the previous port ${rememberedPort}.`);
+      return { port: rememberedPort, source: "remembered" };
+    }
+  }
+
+  for (const candidate of buildOrderedRandomCandidates()) {
+    if (await tryListen(server, candidate)) {
+      await context.globalState.update(REMEMBERED_PORT_KEY, candidate);
+      logger.info(`MCP server selected the port ${candidate}.`);
+      return { port: candidate, source: "automatic" };
+    }
+  }
+
+  if (await tryListen(server, 0)) {
+    const address = server.address();
+    const port =
+      typeof address === "object" && address && "port" in address
+        ? address.port
+        : 0;
+
+    logger.warn(
+      "No port in the automatic range was available, falling back to an OS assigned port.",
+    );
+    return { port, source: "automatic" };
+  }
+
+  throw new Error(vscode.l10n.t("Failed to determine the MCP server port."));
 }
 
 /**
@@ -300,6 +460,37 @@ function closeHttpServer(server: HttpServer): Promise<void> {
       resolve();
     });
   });
+}
+
+/**
+ * Restart the local MCP runtime so a changed port setting takes effect.
+ *
+ * @param context Extension context.
+ */
+export async function restartBreakpointMcpRuntime(
+  context: vscode.ExtensionContext,
+): Promise<void> {
+  await disposeBreakpointMcpRuntime();
+  await ensureBreakpointMcpRuntime(context);
+  definitionsChanged?.fire();
+}
+
+/**
+ * Return the current MCP endpoint together with the resolved port.
+ *
+ * @param context Extension context.
+ * @returns The endpoint, the bound port, and where the port came from.
+ */
+export async function getBreakpointMcpEndpointInfo(
+  context: vscode.ExtensionContext,
+): Promise<{ endpoint: string; port: number; portSource: McpPortSource }> {
+  const activeRuntime = await ensureBreakpointMcpRuntime(context);
+
+  return {
+    endpoint: activeRuntime.endpoint,
+    port: activeRuntime.port,
+    portSource: activeRuntime.portSource,
+  };
 }
 
 /**

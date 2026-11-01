@@ -4,16 +4,6 @@ import * as path from "node:path";
 import * as vscode from "vscode";
 
 /**
- * Supported AI agent configuration targets.
- */
-export interface AgentConfigurationTarget {
-  id: string;
-  displayName: string;
-  configPath: string;
-  serverFieldName: "servers" | "mcpServers";
-}
-
-/**
  * MCP server configuration persisted to agent config files.
  */
 export interface AgentServerConfiguration {
@@ -39,31 +29,10 @@ export const SERVER_ENTRY_NAME = "vscode-debug-tools-for-copilot";
 
 const DEFAULT_TIMEOUT_SECONDS = 180;
 
-const agentConfigurationTargets = new Map<string, AgentConfigurationTarget>();
 const mcpConfigurationExportProfiles = new Map<
   string,
   McpConfigurationExportProfile
 >();
-
-/**
- * Register a supported agent configuration target.
- *
- * @param target Agent configuration target to register.
- */
-export function registerAgentConfigurationTarget(
-  target: AgentConfigurationTarget,
-): void {
-  agentConfigurationTargets.set(target.id, target);
-}
-
-/**
- * Return the supported agent configuration targets.
- *
- * @returns Registered agent configuration targets.
- */
-export function getAgentConfigurationTargets(): AgentConfigurationTarget[] {
-  return [...agentConfigurationTargets.values()];
-}
 
 /**
  * Register a reusable MCP configuration export profile.
@@ -89,29 +58,15 @@ export function getMcpConfigurationExportProfiles(): McpConfigurationExportProfi
  * Create the standard MCP server configuration block.
  *
  * @param endpoint Current MCP endpoint.
- * @param existingEntry Existing entry to preserve user preferences from.
  * @returns The normalized server configuration.
  */
 export function createMcpServerConfiguration(
   endpoint: string,
-  existingEntry?: Partial<AgentServerConfiguration>,
 ): AgentServerConfiguration {
-  const autoApprove = Array.isArray(existingEntry?.autoApprove)
-    ? existingEntry.autoApprove.filter(
-        (value): value is string => typeof value === "string",
-      )
-    : [];
-
   return {
-    autoApprove,
-    disabled:
-      typeof existingEntry?.disabled === "boolean"
-        ? existingEntry.disabled
-        : false,
-    timeout:
-      typeof existingEntry?.timeout === "number"
-        ? existingEntry.timeout
-        : DEFAULT_TIMEOUT_SECONDS,
+    autoApprove: [],
+    disabled: false,
+    timeout: DEFAULT_TIMEOUT_SECONDS,
     type: "streamableHttp",
     url: endpoint,
   };
@@ -168,43 +123,6 @@ function getConfigBasePath(): string {
 }
 
 /**
- * Register the built-in agent configuration targets.
- */
-function registerBuiltInAgentConfigurationTargets(): void {
-  const configBasePath = getConfigBasePath();
-
-  registerAgentConfigurationTarget({
-    id: "cline",
-    displayName: "Cline",
-    configPath: path.join(
-      configBasePath,
-      "Code",
-      "User",
-      "globalStorage",
-      "saoudrizwan.claude-dev",
-      "settings",
-      "cline_mcp_settings.json",
-    ),
-    serverFieldName: "mcpServers",
-  });
-
-  registerAgentConfigurationTarget({
-    id: "cursor",
-    displayName: "Cursor",
-    configPath: path.join(
-      configBasePath,
-      "Cursor",
-      "User",
-      "globalStorage",
-      "cursor.mcp",
-      "settings",
-      "mcp_settings.json",
-    ),
-    serverFieldName: "mcpServers",
-  });
-}
-
-/**
  * Register the built-in reusable MCP export profiles.
  */
 function registerBuiltInMcpConfigurationExportProfiles(): void {
@@ -241,5 +159,4 @@ function registerBuiltInMcpConfigurationExportProfiles(): void {
   });
 }
 
-registerBuiltInAgentConfigurationTargets();
 registerBuiltInMcpConfigurationExportProfiles();

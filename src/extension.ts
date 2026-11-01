@@ -1,14 +1,7 @@
 import * as vscode from "vscode";
-import {
-  promptAndApplyAgentConfigurations,
-  refreshConfiguredAgentConfigurations,
-} from "./mcp/agentConfig";
 import { disposeMcpDiagnostics, showMcpDiagnostics } from "./mcp/diagnostics";
 import { showMcpConfigurationExport } from "./mcp/exportConfiguration";
-import {
-  registerBreakpointMcpSupport,
-  getBreakpointMcpEndpoint,
-} from "./mcp/server";
+import { registerBreakpointMcpSupport } from "./mcp/server";
 import { logger } from "./logger";
 
 /**
@@ -22,40 +15,9 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(registerBreakpointMcpSupport(context));
   registerCommands(context);
-  void refreshConfiguredAgentsOnStartup(context);
 }
 
 function registerCommands(context: vscode.ExtensionContext) {
-  const configureAgentsCommand = vscode.commands.registerCommand(
-    "debugtools.add-mcp-to-agent",
-    async () => {
-      try {
-        const endpoint = await getBreakpointMcpEndpoint(context);
-        const result = await promptAndApplyAgentConfigurations(endpoint);
-
-        if (!result) {
-          return;
-        }
-
-        vscode.window.showInformationMessage(
-          vscode.l10n.t(
-            "Configured {0} agent configuration(s) and removed {1}.",
-            result.updatedAgents.length.toString(),
-            result.removedAgents.length.toString(),
-          ),
-        );
-      } catch (error) {
-        logger.error("Failed to configure agent MCP integrations.", error);
-        void vscode.window.showErrorMessage(
-          vscode.l10n.t(
-            "Failed to configure agent MCP integrations: {0}",
-            String(error),
-          ),
-        );
-      }
-    },
-  );
-
   const showDiagnosticsCommand = vscode.commands.registerCommand(
     "debugtools.show-mcp-diagnostics",
     async () => {
@@ -71,40 +33,9 @@ function registerCommands(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    configureAgentsCommand,
     showDiagnosticsCommand,
     exportConfigurationCommand,
   );
-}
-
-/**
- * Refresh already configured agent clients after the extension activates.
- *
- * @param context Extension context used to resolve the active MCP endpoint.
- */
-async function refreshConfiguredAgentsOnStartup(
-  context: vscode.ExtensionContext,
-): Promise<void> {
-  try {
-    const endpoint = await getBreakpointMcpEndpoint(context);
-    const result = await refreshConfiguredAgentConfigurations(endpoint);
-
-    if (!result || result.updatedAgents.length === 0) {
-      return;
-    }
-
-    logger.info(
-      vscode.l10n.t(
-        "Refreshed {0} configured agent configuration(s) on startup.",
-        result.updatedAgents.length.toString(),
-      ),
-    );
-  } catch (error) {
-    logger.error(
-      "Failed to refresh configured agent MCP integrations on startup.",
-      error,
-    );
-  }
 }
 
 /**

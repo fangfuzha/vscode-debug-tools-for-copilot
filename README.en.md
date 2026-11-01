@@ -15,10 +15,10 @@ Let Copilot drive your VS Code breakpoints and debug sessions directly. The exte
 
 ## How it works
 
-1. On activation the extension starts an HTTP MCP server on a random port bound to the loopback address `127.0.0.1`, so it never listens beyond your own machine.
+1. On activation the extension starts an HTTP MCP server bound to the loopback address `127.0.0.1`, so it never listens beyond your own machine. The port stays as stable as possible: on restart the extension reuses the port from the previous session, and `vscodeDebugTools.mcpPort` can pin it to a fixed value.
 2. The server is registered with VS Code through the `mcpServerDefinitionProviders` contribution point, which is where `VS Code Debug Tools for Copilot` in the MCP server list comes from.
 3. Every MCP tool is backed by the official VS Code debug and breakpoint APIs, so all actions apply to the workspace you currently have open, and new breakpoints show up in the editor gutter as usual.
-4. The port changes on every startup, so the extension automatically refreshes already configured clients (Cline / Cursor) to the current endpoint on launch.
+4. The extension never rewrites a third-party client's configuration file. To connect another MCP client, run `Export MCP Configuration` and paste the result into that client.
 
 In short: VS Code still provides all the debugging power; the AI only issues the commands over MCP.
 
@@ -38,18 +38,19 @@ Copilot Chat talks to this extension through VS Code's native MCP integration, s
 
 You can also run `MCP: List Servers` from the Command Palette to confirm that the server is registered.
 
-### Other MCP clients (Cline / Cursor)
+### Other MCP clients
 
-1. Press `Ctrl+Shift+P`, then run `Configure AI Agent MCP`.
-2. Check the clients you want to configure in the multi-select list (Cline and Cursor are supported today). Already configured clients are pre-checked.
-3. Confirm the selection. The extension writes the matching configuration file (creating it if needed) and points it at the current endpoint.
-4. From then on, the extension refreshes those clients to the current port every time VS Code starts.
+The extension never rewrites a third-party client's configuration file. Run `Export MCP Configuration` from the Command Palette and paste the generated JSON into the target client's MCP settings:
 
-Unchecking a configured client and confirming removes it from the configuration file. If the file already contains an entry named `debugmcp`, the extension updates it in place instead of adding a second entry.
+1. Press `Ctrl+Shift+P`, then run `Export MCP Configuration`.
+2. Pick a shape: a generic server entry, the VS Code `mcp.json` layout (`servers` wrapper), or the common `mcpServers` wrapper.
+3. The snippet is copied to the clipboard and opened in a temporary JSON document — paste it into your client.
+
+The service address looks like `http://127.0.0.1:<port>`. The extension keeps the port as stable as it can: on restart it reuses the port from the previous session. If you need a fixed address, set `vscodeDebugTools.mcpPort` to a specific port (`0` lets the extension choose one).
 
 ### Inspecting state and exporting configuration
 
-- `Show MCP Diagnostics` writes the current endpoint, per-client configuration state, breakpoint count, debug session count, and more to the "VS Code Debug Tools" output channel, with a shortcut to copy the endpoint.
+- `Show MCP Diagnostics` writes the current endpoint, the port and where it came from, breakpoint count, debug session count, and more to the "VS Code Debug Tools" output channel, with a shortcut to copy the endpoint.
 - `Export MCP Configuration` generates a reusable JSON snippet in one of three shapes: a generic server entry, the VS Code `mcp.json` layout (`servers` wrapper), or the common `mcpServers` wrapper — useful for any other MCP-compatible client.
 
 ## Usage
@@ -145,7 +146,7 @@ The extension also ships a Copilot skill (`VS Code Debug Tools Guide`) that teac
 ## Troubleshooting
 
 - **The tools don't show up in Copilot**: make sure `VS Code Debug Tools for Copilot` is checked in the tool picker, then run `Show MCP Diagnostics` and read the endpoint and any errors in the output channel.
-- **A client reports it cannot connect**: the MCP port changes on every startup. The extension refreshes Cline / Cursor automatically; for any client you configured by hand, run `Export MCP Configuration` and copy the current endpoint again.
+- **A client reports it cannot connect**: run `Show MCP Diagnostics` to read the current endpoint, then run `Export MCP Configuration` and copy the address again. If the client still points at an old port, pin `vscodeDebugTools.mcpPort` in the settings so the address stops changing.
 - **A launch configuration cannot be found**: make sure it is defined in the workspace's `.vscode/launch.json`. Configurations from dynamic providers never appear in the list.
 - **The call stack or variables come back empty**: those tools are meant for a paused program. Hit a breakpoint or run `Pause Debugging` first.
 

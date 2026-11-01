@@ -15,10 +15,10 @@ English version: [README.en.md](README.en.md)
 
 ## 运行原理
 
-1. 扩展激活时，在本机回环地址 `127.0.0.1` 的随机端口上启动一个 HTTP MCP 服务，只监听本机。
+1. 扩展激活时，在本机回环地址 `127.0.0.1` 上启动一个 HTTP MCP 服务，只监听本机。端口会尽量保持稳定：重启时优先沿用上一次使用的端口，也可以在设置里用 `vscodeDebugTools.mcpPort` 固定。
 2. 通过 VS Code 的 `mcpServerDefinitionProviders` 贡献点把这个服务注册给 VS Code，MCP 服务器列表中会出现 `VS Code Debug Tools for Copilot`。
 3. 每个 MCP 工具背后都是 VS Code 官方的调试与断点 API，所以所有操作都真实作用于你当前打开的工作区，新增的断点也会正常显示在编辑器的断点槽里。
-4. 端口每次启动都会变化，因此扩展在启动时会自动把已配置的客户端（Cline / Cursor）刷新到当前 endpoint，无需手动改配置。
+4. 扩展不改写任何第三方客户端的配置文件；给其它 MCP 客户端接入时，执行 `导出 MCP 配置` 并粘贴到客户端即可。
 
 简单说：调试能力仍然完全由 VS Code 提供，AI 只是通过 MCP 协议下达指令。
 
@@ -38,18 +38,19 @@ Copilot Chat 通过 VS Code 原生的 MCP 集成使用本扩展的服务，不�
 
 也可以执行命令面板里的 `MCP: List Servers`，确认该服务器已经注册。
 
-### 其他 MCP 客户端（Cline / Cursor）
+### 其他 MCP 客户端
 
-1. 按 `Ctrl+Shift+P` 打开命令面板，执行 `配置 AI 代理 MCP`。
-2. 在多选列表中勾选要配置的客户端（当前支持 Cline、Cursor），已经配置过的客户端会默认勾选。
-3. 点击确定，扩展会写入对应的配置文件（文件不存在时自动创建），并把服务指向当前 endpoint。
-4. 之后每次启动 VS Code，扩展都会自动把这些客户端的地址刷新为当前端口。
+扩展不会改写任何第三方客户端的配置文件。请执行命令面板里的 `导出 MCP 配置`，把生成的 JSON 粘贴到目标客户端的 MCP 设置中：
 
-取消勾选某个已配置的客户端再确定，即可把它从配置文件中移除；如果配置文件里已经存在同名的 `debugmcp` 条目，扩展会就地更新，而不是新增一条。
+1. 按 `Ctrl+Shift+P` 打开命令面板，执行 `导出 MCP 配置`。
+2. 选择一种格式：通用 server 条目、VS Code `mcp.json`（`servers` 包装）或通用 `mcpServers` 包装。
+3. 配置片段会自动复制到剪贴板，并同时在一个临时 JSON 文档中打开，粘贴到客户端即可。
+
+服务地址形如 `http://127.0.0.1:<端口>`。扩展会尽量让端口保持稳定：重启 VS Code 时优先沿用上一次使用的端口。如果你需要一个固定地址，可以在设置里把 `vscodeDebugTools.mcpPort` 改成指定端口（`0` 表示由扩展自动选择）。
 
 ### 查看状态与导出配置
 
-- `显示 MCP 诊断`：在 "VS Code Debug Tools" 输出面板中打印当前 endpoint、各客户端的配置状态、断点数量、调试会话数量等，并可一键复制 endpoint。
+- `显示 MCP 诊断`：在 "VS Code Debug Tools" 输出面板中打印当前 endpoint、端口及其来源、断点数量、调试会话数量等，并可一键复制 endpoint。
 - `导出 MCP 配置`：生成可复制的 JSON 片段，可选择通用 server 条目、VS Code `mcp.json`（`servers` 包装）或通用 `mcpServers` 包装三种格式，用于配置其他 MCP 客户端。
 
 ## 使用
@@ -145,7 +146,7 @@ DebugMCP 兼容入口
 ## 常见问题
 
 - **Copilot 里看不到这些工具**：确认工具选择器里已勾选 `VS Code Debug Tools for Copilot`；再执行 `显示 MCP 诊断`，查看输出面板里的 endpoint 和报错信息。
-- **客户端提示连不上**：MCP 端口每次启动都会变化。扩展会自动刷新 Cline / Cursor 的配置；如果是手动配置的其它客户端，请执行 `导出 MCP 配置` 重新拷贝当前 endpoint。
+- **客户端提示连不上**：先执行 `显示 MCP 诊断` 查看当前 endpoint，再执行 `导出 MCP 配置` 重新拷贝地址。如果客户端里配的是旧端口，可以在设置里固定 `vscodeDebugTools.mcpPort`，地址就不会再变。
 - **找不到某个 launch 配置**：确认它写在工作区的 `.vscode/launch.json` 里；动态 provider 提供的配置不会出现在列表中。
 - **调用栈或变量为空**：这类工具需要在程序暂停时使用，请先让断点命中或执行 `暂停调试`。
 

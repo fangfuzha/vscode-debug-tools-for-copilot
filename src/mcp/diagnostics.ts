@@ -1,8 +1,7 @@
 import * as vscode from "vscode";
 
-import { inspectAgentTargets } from "./agentConfig";
 import {
-  getBreakpointMcpEndpoint,
+  getBreakpointMcpEndpointInfo,
   isBreakpointMcpSupportEnabled,
 } from "./server";
 import { listBreakpoints } from "../debug/breakpoints/shared";
@@ -21,23 +20,19 @@ export async function showMcpDiagnostics(
   context: vscode.ExtensionContext,
 ): Promise<void> {
   try {
-    const endpoint = await getBreakpointMcpEndpoint(context);
+    const { endpoint, port, portSource } = await getBreakpointMcpEndpointInfo(
+      context,
+    );
     const diagnosticsOutput = getDiagnosticsOutputChannel();
-    const agentStates = await inspectAgentTargets();
     const diagnostics = {
       endpoint,
+      port,
+      portSource,
       runtimeEnabled: isBreakpointMcpSupportEnabled(),
       breakpointCount: listBreakpoints().length,
       debugSessionCount: listDebugSessions().length,
       recentDebugConfigurationCount: listRecentDebugConfigurations().length,
       watchExpressionCount: listDebugWatchExpressions().length,
-      agents: agentStates.map((state) => ({
-        id: state.target.id,
-        displayName: state.target.displayName,
-        configured: state.configured,
-        entryName: state.entryName,
-        configPath: state.target.configPath,
-      })),
     };
 
     diagnosticsOutput.clear();
@@ -48,22 +43,15 @@ export async function showMcpDiagnostics(
     diagnosticsOutput.show(true);
 
     const copyEndpointLabel = vscode.l10n.t("Copy Endpoint");
-    const configureAgentsLabel = vscode.l10n.t("Configure AI Agent MCP");
     const exportConfigurationLabel = vscode.l10n.t("Export MCP Configuration");
     const selection = await vscode.window.showInformationMessage(
       vscode.l10n.t("MCP diagnostics were written to the output channel."),
       copyEndpointLabel,
-      configureAgentsLabel,
       exportConfigurationLabel,
     );
 
     if (selection === copyEndpointLabel) {
       await vscode.env.clipboard.writeText(endpoint);
-      return;
-    }
-
-    if (selection === configureAgentsLabel) {
-      await vscode.commands.executeCommand("debugtools.add-mcp-to-agent");
       return;
     }
 

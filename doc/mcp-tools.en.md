@@ -20,9 +20,7 @@ The extension also exposes a small compatibility layer so existing DebugMCP-styl
 - `start_debugging`: starts from a named launch configuration or falls back to an auto-generated configuration from the file path.
 - `get_variables_values`: inspects the current paused frame and returns scope variables.
 - Resources are available under `debugmcp://docs/debug_instructions` and `debugmcp://docs/troubleshooting/<language>`.
-- Use the command palette action `Configure AI Agent MCP` to open a second-level multi-select picker for the currently supported agents, Cline and Cursor.
-- Existing configured agents are pre-checked, and unchecking them removes their agent entry when you confirm.
-- Existing `debugmcp` entries are updated in place when they are already present.
+- The extension never rewrites a third-party client's configuration file. To connect another MCP client, run `Export MCP Configuration` from the Command Palette and paste the generated JSON into that client's MCP settings.
 
 ## Available tools
 

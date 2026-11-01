@@ -2,8 +2,8 @@
   "displayName": "VS Code 调试工具 for Copilot",
   "description": "通过本地 MCP 服务向 Copilot Chat 暴露断点和调试工作台工具。",
   "mcp.debugToolsProvider.label": "VS Code 调试工具 for Copilot",
-  "debugtools.add-mcp-to-agent": "配置 AI 代理 MCP",
   "debugtools.show-mcp-diagnostics": "显示 MCP 诊断",
   "debugtools.export-mcp-configuration": "导出 MCP 配置",
-  "VS Code Debug Tools": "VS Code 调试工具"
+  "VS Code Debug Tools": "VS Code 调试工具",
+  "vscodeDebugTools.mcpPort.description": "本地 MCP 服务使用的 TCP 端口。设为 0 时由扩展自动选择，并尽量在重启后保持不变。"
 }

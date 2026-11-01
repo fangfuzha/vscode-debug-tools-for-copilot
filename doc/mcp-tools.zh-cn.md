@@ -20,9 +20,7 @@ English version: [doc/mcp-tools.en.md](mcp-tools.en.md)
 - `start_debugging`：优先启动指定的 launch 配置；如果没有匹配项，则根据文件路径自动生成默认配置。
 - `get_variables_values`：读取当前暂停帧的作用域变量。
 - 资源文档可通过 `debugmcp://docs/debug_instructions` 和 `debugmcp://docs/troubleshooting/<language>` 访问。
-- 当你需要写入或迁移支持的 agent 配置文件时，请通过命令面板执行 `Configure AI Agent MCP`，它会先打开二级多选菜单；当前仅支持 Cline 和 Cursor。
-- 已经配置过的 agent 会默认勾选，取消勾选后在确认时会被移除。
-- 如果配置文件里已经存在 `debugmcp` 条目，会直接在原位置更新，减少迁移成本。
+- 扩展不会改写任何第三方客户端的配置文件；给其它 MCP 客户端接入时，请通过命令面板执行 `导出 MCP 配置`，把生成的 JSON 粘贴到客户端的 MCP 设置中。
 
 ## 提供的工具
 
