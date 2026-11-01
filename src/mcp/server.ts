@@ -140,12 +140,12 @@ async function createBreakpointMcpRuntime(
       import("@modelcontextprotocol/node"),
     ]);
 
-  const mcpServer = await createBreakpointMcpServer(
-    McpServer as McpServerConstructor,
-    context,
-  );
   const httpServer = createServer(async (request, response) => {
     try {
+      const mcpServer = await createBreakpointMcpServer(
+        McpServer as McpServerConstructor,
+        context,
+      );
       const transport = new NodeStreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
@@ -180,7 +180,7 @@ async function createBreakpointMcpRuntime(
 }
 
 /**
- * 创建一个用于断点管理的 MCP Server。
+ * 为单个无状态 HTTP 请求创建一个用于断点管理的 MCP Server。
  *
  * @param McpServerClass MCP Server 构造函数。
  * @returns MCP Server 实例。
