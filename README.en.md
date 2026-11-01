@@ -1,163 +1,169 @@
 # VS Code Debug Tools for Copilot
 
-A VS Code extension that exposes breakpoint and debug-workbench tools to Copilot Chat through a local MCP service.
+Let Copilot drive your VS Code breakpoints and debug sessions directly. The extension ships a local MCP service, so the AI can list, add, and modify breakpoints, start and step through debugging, and inspect call stacks and variables — without you clicking through the debugger by hand.
 
-## Features and Usage
+中文说明: [README.md](README.md)
 
-- Registers a local MCP server named `VS Code Debug Tools for Copilot`
-- Lets Copilot manage breakpoints and debug workbench actions in the current workspace
-- Provides diagnostics, configuration export, and multi-root workspace support
-- Supports TypeScript development and includes tests and linting configuration
+## Features
+
+- **Breakpoint management**: add source and function breakpoints, remove them, enable or disable them, change conditions, hit counts, and log messages, batch toggle every breakpoint in a file, search breakpoints by keyword, type, or state, summarize them, and clear them all.
+- **Debug session control**: start a `launch.json` configuration, continue, pause, step into/over/out, restart, stop, and list the current debug sessions and threads.
+- **Debug state inspection**: view the call stack, scopes, and variables, and evaluate expressions in the `watch` / `repl` / `hover` context.
+- **Watch expressions**: maintain an extension-managed watch list and evaluate it in bulk.
+- **Multi-root workspace support**: paths may be absolute or workspace-relative, and `workspaceFolderPath` pins down the target folder when several roots are open.
+- **DebugMCP-compatible entry points**: extra tools such as `get_debug_instructions`, `start_debugging`, and `get_variables_values` for clients that expect that calling style.
+
+## How it works
+
+1. On activation the extension starts an HTTP MCP server on a random port bound to the loopback address `127.0.0.1`, so it never listens beyond your own machine.
+2. The server is registered with VS Code through the `mcpServerDefinitionProviders` contribution point, which is where `VS Code Debug Tools for Copilot` in the MCP server list comes from.
+3. Every MCP tool is backed by the official VS Code debug and breakpoint APIs, so all actions apply to the workspace you currently have open, and new breakpoints show up in the editor gutter as usual.
+4. The port changes on every startup, so the extension automatically refreshes already configured clients (Cline / Cursor) to the current endpoint on launch.
+
+In short: VS Code still provides all the debugging power; the AI only issues the commands over MCP.
+
+## Installation
+
+Search for "VS Code Debug Tools for Copilot" in the VS Code Marketplace and install it. VS Code 1.144.0 or later is required.
+
+## Configuration
+
+### Copilot Chat (built-in integration)
+
+Copilot Chat talks to this extension through VS Code's native MCP integration, so no extra configuration is needed:
+
+1. Open Copilot Chat and click the tool picker (the tools icon above the chat input).
+2. Check `VS Code Debug Tools for Copilot` in the list.
+3. The breakpoint and debug tools are now callable from your conversations.
+
+You can also run `MCP: List Servers` from the Command Palette to confirm that the server is registered.
+
+### Other MCP clients (Cline / Cursor)
+
+1. Press `Ctrl+Shift+P`, then run `Configure AI Agent MCP`.
+2. Check the clients you want to configure in the multi-select list (Cline and Cursor are supported today). Already configured clients are pre-checked.
+3. Confirm the selection. The extension writes the matching configuration file (creating it if needed) and points it at the current endpoint.
+4. From then on, the extension refreshes those clients to the current port every time VS Code starts.
+
+Unchecking a configured client and confirming removes it from the configuration file. If the file already contains an entry named `debugmcp`, the extension updates it in place instead of adding a second entry.
+
+### Inspecting state and exporting configuration
+
+- `Show MCP Diagnostics` writes the current endpoint, per-client configuration state, breakpoint count, debug session count, and more to the "VS Code Debug Tools" output channel, with a shortcut to copy the endpoint.
+- `Export MCP Configuration` generates a reusable JSON snippet in one of three shapes: a generic server entry, the VS Code `mcp.json` layout (`servers` wrapper), or the common `mcpServers` wrapper — useful for any other MCP-compatible client.
 
 ## Usage
 
-### 1. Install and configure
+Just describe what you need in Copilot Chat, for example:
 
-After installing the extension, you need to configure your AI agent the first time you use it:
+- Breakpoints
+  - "List all breakpoints in the current workspace"
+  - "Add a breakpoint on line 42 of `src/app.ts`"
+  - "Add a breakpoint on the `handleRequest` function with the condition `user.role === 'admin'`"
+  - "Disable the breakpoint on line 42" / "Disable every breakpoint in this file" / "Clear all breakpoints"
+- Debug control
+  - "Start the `Run Extension` launch configuration"
+  - "Continue" / "Pause" / "Step over" / "Step into" / "Stop debugging"
+- Debug inspection
+  - "Show me the current call stack and local variables"
+  - "Evaluate `payload.items.length` in the debug context"
 
-1. Open the Command Palette with `Ctrl+Shift+P`
-2. Run `Configure AI Agent MCP`
-3. In the picker, select the agents you want to configure (`Cline`, `Cursor`)
-4. Confirm the selection, and the extension will update the corresponding configuration files
-5. After that, the extension automatically refreshes already configured clients to the current MCP endpoint on startup
-6. To inspect the current MCP endpoint, agent configuration, and debug state, run `Show MCP Diagnostics`
-7. To generate a reusable JSON snippet for another MCP-compatible client, run `Export MCP Configuration`
+Adding a breakpoint returns a stable identifier (`key`) for it. Prefer that `key` when removing or updating breakpoints later, since it avoids ambiguity between same-named functions or several breakpoints on one line.
 
-The extension also ships with a Copilot skill that helps Copilot choose the right breakpoint and debug tools:
+## Tool reference
 
-- [VS Code Debug Tools Guide](src/lm/skills/vscode-debug-tools-guide/SKILL.md)
+Breakpoints
 
-This skill focuses on tool selection and parameter rules. The user-facing installation and usage flow is centralized in this page.
+| Tool | Purpose |
+| --- | --- |
+| `list_breakpoints` | List every breakpoint |
+| `list_breakpoints_in_file` | List the breakpoints in one file |
+| `get_breakpoint_statistics` | Summarize totals, enabled counts, and type distribution |
+| `search_breakpoints` | Search breakpoints by keyword, type, or enabled state |
+| `add_source_breakpoint` | Add a source breakpoint at a file and line |
+| `add_function_breakpoint` | Add a function breakpoint by function name |
+| `remove_breakpoint` | Remove a breakpoint |
+| `set_breakpoint_enabled` | Enable or disable a breakpoint |
+| `update_breakpoint` | Change a breakpoint's state, condition, hit count, or log message |
+| `set_breakpoints_enabled_in_file` | Batch enable/disable all source breakpoints in a file |
+| `clear_breakpoints` | Remove every breakpoint |
 
-### 2. Use breakpoint tools in Copilot
+Debug sessions
 
-Once configured, you can use the following breakpoint management actions in Copilot Chat:
+| Tool | Purpose |
+| --- | --- |
+| `list_debug_sessions` | List the current debug sessions |
+| `list_debug_threads` | List the threads of a session |
+| `pause_debug_session` | Pause debugging |
+| `continue_debug_session` | Resume execution |
+| `step_over_debug_session` | Step over the current line |
+| `step_into_debug_session` | Step into the called function |
+| `step_out_debug_session` | Step out of the current function |
+| `restart_debug_session` | Restart a debug session |
+| `stop_debug_session` | Stop debugging |
 
-- **List breakpoints**: ask Copilot to list all breakpoints in the current workspace
-- **Add a breakpoint**: ask Copilot to add a breakpoint on line 10 or at function `foo`
-- **Remove a breakpoint**: ask Copilot to remove the breakpoint on line 10
-- **Enable or disable a breakpoint**: ask Copilot to disable the breakpoint on line 10
-- **Debug control**: ask Copilot to start debugging or step through code
+Workbench and inspection
 
-### 3. Tool reference
+| Tool | Purpose |
+| --- | --- |
+| `open_debug_source_file` | Open and focus a source file in the editor |
+| `list_debug_launch_configurations` | List the configurations in `launch.json` |
+| `start_debug_launch_configuration` | Start debugging by name or raw configuration |
+| `list_debug_call_stack` | Inspect the call stack |
+| `list_debug_scopes` | Inspect the scopes of a stack frame |
+| `list_debug_variables` | Expand a variables reference |
+| `evaluate_debug_expression` | Evaluate an expression in a debug context |
+| `list_debug_watch_expressions` | List watch expressions |
+| `add_debug_watch_expression` | Add a watch expression |
+| `remove_debug_watch_expression` | Remove a watch expression |
+| `clear_debug_watch_expressions` | Clear all watch expressions |
+| `evaluate_debug_watch_expressions` | Evaluate all watch expressions |
 
-The extension provides a complete set of breakpoint and debug tools. See the following documentation for details:
+DebugMCP-compatible entry points
+
+| Tool | Purpose |
+| --- | --- |
+| `get_debug_instructions` | Return a Markdown debugging guide |
+| `start_debugging` | Start debugging, generating a default configuration per language |
+| `get_variables_values` | Read the scope variables of the current paused frame |
+
+For the full input, output, and matching rules of every tool, see:
 
 - [Chinese tool documentation](doc/mcp-tools.zh-cn.md)
 - [English tool documentation](doc/mcp-tools.en.md)
 
-These documents include the full tool list, input structures, return values, matching rules, and path handling rules.
+The extension also ships a Copilot skill (`VS Code Debug Tools Guide`) that teaches Copilot which tool to pick and how to pass parameters.
 
-### 4. Launch configurations and multi-root workspaces
+## Multi-root workspaces and path rules
 
-`start_debug_launch_configuration` supports configuration selection in multi-root workspaces.
+- File paths may be absolute or relative to a workspace folder.
+- In a multi-root workspace, pass `workspaceFolderPath` together with relative paths. Without it the extension tries to infer a single matching workspace folder and returns an ambiguity error when several candidates exist.
+- `list_debug_launch_configurations` and `start_debug_launch_configuration` also need `workspaceFolderPath` when different roots contain launch configurations with the same name.
+- `list_debug_launch_configurations` only reads `.vscode/launch.json` from the workspace; configurations supplied by a dynamic `DebugConfigurationProvider` are not enumerated.
+- The debug session tools all accept an optional `sessionId` and act on the active session when it is omitted. An invalid `sessionId` produces an error instead of a guess.
 
-- If only one workspace folder is open, you can start a configuration directly by `launchName` or a raw `launchConfiguration` object.
-- If multiple workspace folders are open and different roots contain a launch configuration with the same name, pass `workspaceFolderPath` to identify the target workspace.
-- `list_debug_launch_configurations` also accepts `workspaceFolderPath`, which lets you inspect the `launch.json` file for a specific workspace folder only.
+## Troubleshooting
 
-## Development requirements
+- **The tools don't show up in Copilot**: make sure `VS Code Debug Tools for Copilot` is checked in the tool picker, then run `Show MCP Diagnostics` and read the endpoint and any errors in the output channel.
+- **A client reports it cannot connect**: the MCP port changes on every startup. The extension refreshes Cline / Cursor automatically; for any client you configured by hand, run `Export MCP Configuration` and copy the current endpoint again.
+- **A launch configuration cannot be found**: make sure it is defined in the workspace's `.vscode/launch.json`. Configurations from dynamic providers never appear in the list.
+- **The call stack or variables come back empty**: those tools are meant for a paused program. Hit a breakpoint or run `Pause Debugging` first.
 
-- Node.js 22.x or later (`@vscode/vsce` requires Node >= 22)
-- VS Code 1.115.0 or later
+## Debugging
 
-## Build and run
+- Runtime logs and diagnostics are written to the **"VS Code Debug Tools"** output channel (View → Output → select that channel).
+- To debug the extension itself, open this project in VS Code, put the cursor on `src/extension.ts`, and press **F5** to start an Extension Development Host. `npm run watch` recompiles automatically on save.
+- The same tasks can be run from the terminal (Node.js 22 or later is required):
 
-1. **Install dependencies**
-
-   In the project root, run:
-
-   ```sh
-   npm install
-   ```
-
-2. **Compile TypeScript**
-
-   ```sh
-   npm run compile
-   ```
-
-   Or use watch mode for automatic recompilation:
-
-   ```sh
-   npm run watch
-   ```
-
-3. **Debug the extension in VS Code**
-
-   Focus the entry file, usually `src/extension.ts`, or the compiled file `out/extension.js`, then press **F5** to launch extension debugging. This opens a new VS Code window with the extension loaded. When debugging through the compiled JavaScript file, choose the `vscode extension development` debugger.
-
-4. **Test the extension**
-
-   In the newly opened VS Code window:
-   - Open the Command Palette with `Ctrl+Shift+P`
-   - Run the command that shows the welcome message
-   - You should see the welcome notification
-
-5. **Run lint**
-
-   ```sh
-   npm run lint
-   ```
-
-6. **Run tests**
-
-   ```sh
-   npm test
-   ```
-
-## Project structure
-
-```text
-├── src/
-│   └── extension.ts          # extension entry point
-├── out/                      # compiled output
-├── package.json              # project configuration and dependencies
-├── tsconfig.json             # TypeScript configuration
-└── README.md                 # project documentation
-```
-
-## Packaging and release
-
-1. **Configure Marketplace Trusted Publishing**
-
-   Create a Trusted Publishing policy in the Visual Studio Marketplace publisher settings and bind it to:
-
-   - GitHub owner: `fangfuzha`
-   - Repository: `vscode-debug-tools-for-copilot`
-   - Workflow file: `publish.yml`
-
-   The workflow uses GitHub Actions OIDC and does not require a long-lived `VSCE_PAT`.
-
-2. **Install the dependencies**
-
-   ```sh
-   npm ci
-   ```
-
-   `vsce` is pinned as a devDependency in [package.json](package.json), so there is no separate install step.
-
-3. **Package the extension**
-
-   ```sh
-   npm run package
-   ```
-
-4. **Publish to the Marketplace**
-
-   ```sh
-   npx --no-install vsce publish
-   ```
-
-   CI publishing authenticates through GitHub Actions OIDC.
-
-## Development tips
-
-- You need to recompile after code changes before they appear in the debug window
-- You can use `npm run watch` to automatically recompile on file changes
-- You can set breakpoints in the code while debugging
+  ```sh
+  npm install     # install dependencies
+  npm run compile # compile TypeScript
+  npm run watch   # recompile on change
+  npm run lint    # lint the sources
+  ```
 
 ## Related resources
 
-- [VS Code extension API](https://code.visualstudio.com/api)
-- [VS Code extension samples](https://github.com/Microsoft/vscode-extension-samples)
+- [Use MCP servers in VS Code](https://code.visualstudio.com/docs/copilot/chat/mcp-servers)
+- [VS Code debug API](https://code.visualstudio.com/api/references/vscode-api)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
