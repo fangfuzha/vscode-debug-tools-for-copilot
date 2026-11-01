@@ -8,6 +8,7 @@ import { listBreakpoints } from "../debug/breakpoints/shared";
 import { listDebugSessions } from "../debug/sessions/shared";
 import { listRecentDebugConfigurations } from "../debug/workbench/recentDebugConfigurations";
 import { listDebugWatchExpressions } from "../debug/workbench/watchExpressionStore";
+import { getContributedCommands } from "../statusBar";
 
 let diagnosticsOutputChannel: vscode.OutputChannel | undefined;
 
@@ -33,6 +34,7 @@ export async function showMcpDiagnostics(
       debugSessionCount: listDebugSessions().length,
       recentDebugConfigurationCount: listRecentDebugConfigurations().length,
       watchExpressionCount: listDebugWatchExpressions().length,
+      commands: getContributedCommands(context),
     };
 
     diagnosticsOutput.clear();

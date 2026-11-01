@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 
+import { logger } from "./logger";
+
 /**
  * 状态栏菜单里各命令的本地化标题。
  *
@@ -101,34 +103,69 @@ async function showCommandMenu(
  * @param context 扩展上下文。
  * @returns 命令清单，标题与分类均已本地化。
  */
-function getContributedCommands(
+export function getContributedCommands(
   context: vscode.ExtensionContext,
 ): ContributedCommand[] {
   const manifest = context.extension.packageJSON as {
     contributes?: {
-      commands?: { command: string; title: string; category?: string }[];
+      commands?: { command?: unknown; title?: unknown; category?: unknown }[];
     };
   };
 
-  const contributed = manifest.contributes?.commands ?? [];
+  const contributed = manifest.contributes?.commands;
 
-  return contributed.map((entry) => ({
-    command: entry.command,
-    label:
-      localizedCommandTitles.get(entry.command)?.() ??
-      stripManifestPlaceholder(entry.title),
-    description: entry.category
-      ? vscode.l10n.t(stripManifestPlaceholder(entry.category))
-      : undefined,
-  }));
+  if (!Array.isArray(contributed)) {
+    return [];
+  }
+
+  return contributed.map((entry) => {
+    const command = readString(entry.command);
+    const title = readString(entry.title);
+    const category = readString(entry.category);
+
+    return {
+      command,
+      label:
+        localizedCommandTitles.get(command)?.() ??
+        stripManifestPlaceholder(title),
+      description: category
+        ? vscode.l10n.t(stripManifestPlaceholder(category))
+        : undefined,
+    };
+  });
+}
+
+/**
+ * 读取字符串字段，非字符串一律按空串处理。
+ *
+ * 扩展宿主交给扩展的 packageJSON 是扩展描述对象，其 contributes 已经被 VS Code 的
+ * 清单本地化层改写过，字段结构不保证和 package.json 原文一致，这里不能假定类型。
+ *
+ * @param value 字段值。
+ * @returns 字符串值，非字符串时返回空串。
+ */
+function readString(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value !== undefined && value !== null) {
+    logger.warn(
+      `Unexpected non-string manifest value: ${typeof value} (${JSON.stringify(value)?.slice(0, 80)})`,
+    );
+  }
+
+  return "";
 }
 
 /**
  * 去掉清单里的 %占位符% 包装，保留键名本身。
  *
- * @param value 清单里的原始字符串。
+ * @param value 清单里的原始值。
  * @returns 去掉占位符后的字符串。
  */
-function stripManifestPlaceholder(value: string): string {
-  return value.replace(/^%(.+)%$/, "$1");
+function stripManifestPlaceholder(value: unknown): string {
+  const text = readString(value);
+
+  return text.replace(/^%(.+)%$/, "$1");
 }
