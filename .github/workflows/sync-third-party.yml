@@ -1,0 +1,45 @@
+name: Sync Third-party Submodules
+
+on:
+  schedule:
+    # 每天 UTC 03:00（北京时间 11:00）把 third_party 子模块推进到上游最新提交
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-third-party
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Update submodules to the latest upstream commit
+        run: |
+          git submodule update --init --recursive
+          git submodule update --remote --recursive
+
+      - name: Commit the bumped pointers
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Submodules are already up to date."
+            exit 0
+          fi
+          git add .gitmodules third_party
+          git commit -m "chore: sync third-party submodules"
+          git pull --rebase origin main
+          git push origin HEAD:main

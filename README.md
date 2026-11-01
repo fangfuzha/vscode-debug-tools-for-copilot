@@ -153,6 +153,7 @@ DebugMCP 兼容入口
 
 - 运行日志与诊断信息在 **“VS Code Debug Tools”** 输出面板中（视图 → 输出 → 选择该通道）。
 - 需要调试扩展自身时：在 VS Code 中打开本项目，在 `src/extension.ts` 上按 **F5** 启动 Extension Development Host；配合 `npm run watch` 可以在保存后自动重新编译。
+- 第三方参考源码位于 `third_party/DebugMCP`（submodule，指向 [microsoft/DebugMCP](https://github.com/microsoft/DebugMCP)）；本地执行 `git submodule update --remote third_party/DebugMCP` 可推进到上游最新提交，仓库每天也会由 CI 自动同步该指针。
 - 也可以直接执行以下命令（需要 Node.js 22 或更高版本）：
 
   ```sh

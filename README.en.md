@@ -153,6 +153,7 @@ The extension also ships a Copilot skill (`VS Code Debug Tools Guide`) that teac
 
 - Runtime logs and diagnostics are written to the **"VS Code Debug Tools"** output channel (View → Output → select that channel).
 - To debug the extension itself, open this project in VS Code, put the cursor on `src/extension.ts`, and press **F5** to start an Extension Development Host. `npm run watch` recompiles automatically on save.
+- The vendored upstream reference lives in `third_party/DebugMCP` (a submodule pointing at [microsoft/DebugMCP](https://github.com/microsoft/DebugMCP)). Run `git submodule update --remote third_party/DebugMCP` to move it to the latest upstream commit; CI also refreshes that pointer every day.
 - The same tasks can be run from the terminal (Node.js 22 or later is required):
 
   ```sh

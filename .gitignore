@@ -40,4 +40,7 @@ Thumbs.db
 # 其他
 .nyc_output
 coverage/
-third_party
+
+# 第三方依赖：仅跟踪 submodule 指针，其余内容忽略
+third_party/*
+!third_party/DebugMCP

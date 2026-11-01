@@ -1,0 +1,4 @@
+[submodule "third_party/DebugMCP"]
+	path = third_party/DebugMCP
+	url = https://github.com/microsoft/DebugMCP
+	branch = main
