@@ -163,7 +163,9 @@ DebugMCP 兼容入口
   npm run lint    # 代码检查
   ```
 
-- 界面文案由 `l10n/bundle.l10n.json` 驱动：改完源码里的 `vscode.l10n.t(...)` 后执行 `npm run l10n` 重新生成母版文件；`npm run l10n:xlf` 可导出 XLIFF 交给译者，用 `npm run l10n:import` 回灌（注意该命令会整体覆盖目标语言 bundle，未翻译的条目会被清空）。
+- 界面文案分两层：`package.nls.json` 负责 `package.json` 里的 `%占位符%`（命令标题、扩展显示名等），`l10n/bundle.l10n.json` 负责源码里的 `vscode.l10n.t(...)`。改完源码里的 `vscode.l10n.t(...)` 后执行 `npm run l10n` 重新生成运行时母版。
+- 翻译流程：`npm run l10n:xlf` 把上述两层打包成一个 XLIFF（输出到 `l10n-xlf/`）交给译者。译者回传的文件需保留 `<file>` 的 `target-language` 属性，并为每条 `<trans-unit>` 填入 `<target>`；`npm run l10n:import` 负责回灌，会自动按类型落位（`package.nls.<语言>.json` 放扩展根目录，`bundle.l10n.<语言>.json` 放 `l10n/` 目录），同时报告缺失译文的条目，并在最后自动执行 `npm run l10n:check` 校验键集合一致性。
+- 新增一种语言时，在扩展根目录放 `package.nls.<语言>.json`、在 `l10n/` 目录放 `bundle.l10n.<语言>.json` 即可。
 
 ## 相关资源
 

@@ -163,7 +163,9 @@ The extension also ships a Copilot skill (`VS Code Debug Tools Guide`) that teac
   npm run lint    # lint the sources
   ```
 
-- UI strings live in `l10n/bundle.l10n.json`: run `npm run l10n` after changing any `vscode.l10n.t(...)` call to regenerate the master bundle. `npm run l10n:xlf` exports an XLIFF for translators and `npm run l10n:import` imports it back — note that the import replaces the target-language bundle wholesale, so untranslated entries are dropped.
+- UI strings live in two layers: `package.nls.json` backs the `%placeholder%` entries in `package.json` (command titles, the extension display name, …), while `l10n/bundle.l10n.json` backs the `vscode.l10n.t(...)` calls in the sources. Run `npm run l10n` after changing any `vscode.l10n.t(...)` call to regenerate the runtime master bundle.
+- Translation workflow: `npm run l10n:xlf` packs both layers into a single XLIFF (written to `l10n-xlf/`). The file your translator returns must keep the `target-language` attribute on `<file>` and carry a `<target>` for every `<trans-unit>`. `npm run l10n:import` imports it back, places each file where it belongs (`package.nls.<locale>.json` in the extension root, `bundle.l10n.<locale>.json` in `l10n/`), reports the entries that came back without a translation, and finally runs `npm run l10n:check` to verify the key sets.
+- To add a language, drop `package.nls.<locale>.json` in the extension root and `bundle.l10n.<locale>.json` in `l10n/`.
 
 ## Related resources
 

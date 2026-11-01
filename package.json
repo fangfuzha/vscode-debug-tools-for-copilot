@@ -99,8 +99,8 @@
     "lint": "eslint src scripts",
     "l10n": "vscode-l10n-dev export --outDir ./l10n src && node -e \"const fs=require('fs');const p='l10n/bundle.l10n.json';if(process.platform==='win32'){const s=fs.readFileSync(p,'utf8').replace(/\\r/g,'').split(String.fromCharCode(10)).join(String.fromCharCode(13,10));fs.writeFileSync(p,s,'utf8')}\"",
     "l10n:check": "node scripts/l10n-check.js",
-    "l10n:xlf": "node -e \"require('fs').mkdirSync('l10n-xlf',{recursive:true})\" && vscode-l10n-dev generate-xlf --outFile ./l10n-xlf/bundle.l10n.xlf ./l10n/bundle.l10n.json",
-    "l10n:import": "vscode-l10n-dev import-xlf --outDir ./l10n ./l10n-xlf",
+    "l10n:xlf": "node scripts/l10n-xlf.js",
+    "l10n:import": "node scripts/l10n-import.js",
     "package": "npm run bundle && vsce package"
   },
   "devDependencies": {
