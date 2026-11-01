@@ -1,7 +1,7 @@
 {
   "displayName": "VS Code Debug Tools for Copilot",
   "description": "Expose breakpoint and debug-workbench tools to Copilot Chat through a local MCP service.",
-  "mcp.breakpointProvider.label": "VS Code Debug Tools for Copilot",
+  "mcp.debugToolsProvider.label": "VS Code Debug Tools for Copilot",
   "Configure AI Agent MCP": "Configure AI Agent MCP",
   "debugtools.add-mcp-to-agent": "Configure AI Agent MCP",
   "Show MCP Diagnostics": "Show MCP Diagnostics",

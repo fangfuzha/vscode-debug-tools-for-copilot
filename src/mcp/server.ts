@@ -81,7 +81,7 @@ export function registerBreakpointMcpSupport(
 
   void ensureBreakpointMcpRuntime(context).catch((error) => {
     const message = vscode.l10n.t(
-      "Failed to start the VS Code Breakpoint Tools server.",
+      "Failed to start the VS Code Debug Tools for Copilot server.",
     );
 
     logger.error(message, error);
@@ -170,7 +170,7 @@ async function createBreakpointMcpRuntime(
     },
     toServerDefinition() {
       return new vscode.McpHttpServerDefinition(
-        vscode.l10n.t("VS Code Breakpoint Tools"),
+        vscode.l10n.t("VS Code Debug Tools for Copilot"),
         vscode.Uri.parse(endpoint),
         {},
         MCP_SERVER_VERSION,

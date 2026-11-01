@@ -1,7 +1,7 @@
 {
   "Extension deactivated.": "扩展已停用。",
-  "Failed to start the VS Code Breakpoint Tools server.": "无法启动 VS Code 调试工具 for Copilot 服务。",
-  "VS Code Breakpoint Tools": "VS Code 调试工具 for Copilot",
+  "Failed to start the VS Code Debug Tools for Copilot server.": "无法启动 VS Code 调试工具 for Copilot 服务。",
+  "VS Code Debug Tools for Copilot": "VS Code 调试工具 for Copilot",
   "VS Code Debug Tools": "VS Code 调试工具",
   "VS Code Debug Tools for Copilot diagnostics": "VS Code 调试工具 for Copilot 诊断",
   "Export MCP Configuration": "导出 MCP 配置",

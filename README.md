@@ -25,7 +25,7 @@
 
 Copilot skill 也随扩展提供，用来帮助 Copilot 选择正确的断点和调试工具：
 
-- [Breakpoint MCP Tools Guide](src/lm/skills/breakpoint-mcp-tools-guide/SKILL.md)
+- [VS Code Debug Tools Guide](src/lm/skills/vscode-debug-tools-guide/SKILL.md)
 
 这部分面向 Copilot 的工具选择和参数规则；用户的安装、配置和使用说明都集中在本页。
 

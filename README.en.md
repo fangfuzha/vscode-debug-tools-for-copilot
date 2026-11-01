@@ -25,7 +25,7 @@ After installing the extension, you need to configure your AI agent the first ti
 
 The extension also ships with a Copilot skill that helps Copilot choose the right breakpoint and debug tools:
 
-- [Breakpoint MCP Tools Guide](src/lm/skills/breakpoint-mcp-tools-guide/SKILL.md)
+- [VS Code Debug Tools Guide](src/lm/skills/vscode-debug-tools-guide/SKILL.md)
 
 This skill focuses on tool selection and parameter rules. The user-facing installation and usage flow is centralized in this page.
 

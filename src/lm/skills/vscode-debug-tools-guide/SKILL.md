@@ -1,9 +1,9 @@
 ---
-name: breakpoint-mcp-tools-guide
+name: vscode-debug-tools-guide
 description: "Use when the user asks how to use the breakpoint or debug-session MCP tools, which tool to choose, how to pass parameters, or how to inspect and manage VS Code breakpoints and debug controls through Copilot. 适用于询问如何使用断点或调试会话 MCP 工具、选择哪个工具、如何传参，以及如何通过 Copilot 检查和管理 VS Code 断点与调试控制。"
 ---
 
-# Debug Tools for Copilot Guide
+# VS Code Debug Tools Guide
 
 Use this skill when explaining or choosing the extension's breakpoint MCP tools.
 

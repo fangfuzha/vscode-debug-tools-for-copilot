@@ -1,7 +1,7 @@
 {
   "Extension deactivated.": "Extension deactivated.",
-  "Failed to start the VS Code Breakpoint Tools server.": "Failed to start the VS Code Debug Tools for Copilot server.",
-  "VS Code Breakpoint Tools": "VS Code Debug Tools for Copilot",
+  "Failed to start the VS Code Debug Tools for Copilot server.": "Failed to start the VS Code Debug Tools for Copilot server.",
+  "VS Code Debug Tools for Copilot": "VS Code Debug Tools for Copilot",
   "VS Code Debug Tools": "VS Code Debug Tools",
   "VS Code Debug Tools for Copilot diagnostics": "VS Code Debug Tools for Copilot diagnostics",
   "Export MCP Configuration": "Export MCP Configuration",
