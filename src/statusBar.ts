@@ -129,7 +129,7 @@ export function getContributedCommands(
         localizedCommandTitles.get(command)?.() ??
         stripManifestPlaceholder(title),
       description: category
-        ? vscode.l10n.t(stripManifestPlaceholder(category))
+        ? stripManifestPlaceholder(category)
         : undefined,
     };
   });
@@ -141,12 +141,23 @@ export function getContributedCommands(
  * 扩展宿主交给扩展的 packageJSON 是扩展描述对象，其 contributes 已经被 VS Code 的
  * 清单本地化层改写过，字段结构不保证和 package.json 原文一致，这里不能假定类型。
  *
+ * 其中命令的标题与分类在本地化后会被 VS Code 换成 { value, original } 对象
+ * （value 是译文，original 是原文），这里要取出 value。
+ *
  * @param value 字段值。
  * @returns 字符串值，非字符串时返回空串。
  */
 function readString(value: unknown): string {
   if (typeof value === "string") {
     return value;
+  }
+
+  if (value !== null && typeof value === "object" && "value" in value) {
+    const localized = (value as { value?: unknown }).value;
+
+    if (typeof localized === "string") {
+      return localized;
+    }
   }
 
   if (value !== undefined && value !== null) {
