@@ -44,3 +44,6 @@ coverage/
 # 第三方依赖：仅跟踪 submodule 指针，其余内容忽略
 third_party/*
 !third_party/DebugMCP
+
+# 本地化：XLIFF 翻译中间产物
+l10n-xlf/

@@ -187,26 +187,9 @@ function registerDebugDocumentationResources(server: McpServerLike): void {
  * @returns Markdown-formatted guide.
  */
 function getDebugInstructionsMarkdown(): string {
-  return `# Debugging Instructions Guide
-
-Use these steps when debugging with VS Code Debug Tools for Copilot:
-
-1. Set at least one breakpoint before starting a debug session.
-2. Prefer \`start_debugging\` for a direct file or test entrypoint.
-3. Prefer a named launch configuration when the workspace already defines one.
-4. Pause the session before reading call stacks, scopes, or variables.
-5. Use \`get_variables_values\`, \`list_debug_call_stack\`, and \`list_debug_scopes\` to inspect state.
-6. Use \`evaluate_debug_expression\` only after you have a paused frame.
-
-Root-cause reminders:
-- Do not stop at a symptom.
-- Trace the value back to the point where it first became incorrect.
-- Re-run the session with breakpoints moved closer to the source when needed.
-
-Compatibility notes:
-- Copilot can use the \`get_debug_instructions\` tool directly.
-- MCP-compatible clients can read this guide from the \`debugmcp://docs/debug_instructions\` resource.
-`;
+  return vscode.l10n.t(
+    "# Debugging Instructions Guide\n\nUse these steps when debugging with VS Code Debug Tools for Copilot:\n\n1. Set at least one breakpoint before starting a debug session.\n2. Prefer `start_debugging` for a direct file or test entrypoint.\n3. Prefer a named launch configuration when the workspace already defines one.\n4. Pause the session before reading call stacks, scopes, or variables.\n5. Use `get_variables_values`, `list_debug_call_stack`, and `list_debug_scopes` to inspect state.\n6. Use `evaluate_debug_expression` only after you have a paused frame.\n\nRoot-cause reminders:\n- Do not stop at a symptom.\n- Trace the value back to the point where it first became incorrect.\n- Re-run the session with breakpoints moved closer to the source when needed.\n\nCompatibility notes:\n- Copilot can use the `get_debug_instructions` tool directly.\n- MCP-compatible clients can read this guide from the `debugmcp://docs/debug_instructions` resource.\n",
+  );
 }
 
 /**
@@ -217,60 +200,33 @@ Compatibility notes:
  */
 function getTroubleshootingMarkdown(language: CompatibilityLanguage): string {
   const contentByLanguage: Record<CompatibilityLanguage, string> = {
-    python: vscode.l10n.t(`# Python Debugging Tips
-
-- Make sure the Python extension is installed and the correct interpreter is selected.
-- For tests, prefer a launch configuration that uses your test runner explicitly.
-- If the script starts but breakpoints are skipped, check source path mappings and virtual environment activation.
-`),
-    javascript: vscode.l10n.t(`# JavaScript Debugging Tips
-
-- Use a Node-compatible debug type such as \`pwa-node\`.
-- Make sure the file you launch is runnable JavaScript or is loaded through a transpilation setup.
-- Verify \`cwd\`, \`program\`, and source maps when breakpoints do not bind.
-`),
-    typescript: vscode.l10n.t(`# TypeScript Debugging Tips
-
-- Prefer a Node-based debug configuration that understands transpiled output or source maps.
-- If you debug the source file directly, confirm that your runtime can execute TypeScript.
-- Check \`outFiles\` and source maps when breakpoints land in compiled output instead of source.
-`),
-    java: vscode.l10n.t(`# Java Debugging Tips
-
-- Make sure the Java language support extension is installed.
-- Prefer a launch configuration that resolves the correct main class or test class.
-- If the debugger cannot attach, verify the project structure and classpath resolution.
-`),
-    csharp: vscode.l10n.t(`# C# Debugging Tips
-
-- Make sure the C# / .NET debugging extension is installed.
-- Open the solution or project root so the debugger can resolve the build output.
-- If the session fails to start, confirm that the target project builds successfully first.
-`),
-    go: vscode.l10n.t(`# Go Debugging Tips
-
-- Make sure the Go extension is installed and configured.
-- Verify that the current workspace contains a runnable Go module or package.
-- If breakpoints are skipped, confirm that the binary was built with matching source paths.
-`),
-    rust: vscode.l10n.t(`# Rust Debugging Tips
-
-- Make sure your Rust debug extension and debugger backend are installed.
-- Prefer a debug configuration that launches the compiled binary with matching symbols.
-- If the session stops in unexpected locations, check build profile and debug symbol generation.
-`),
-    php: vscode.l10n.t(`# PHP Debugging Tips
-
-- Make sure the PHP debugger extension is installed and configured.
-- Verify the PHP interpreter path and any remote or container mappings.
-- If breakpoints do not bind, confirm that the web server or CLI entrypoint matches the launched file.
-`),
-    ruby: vscode.l10n.t(`# Ruby Debugging Tips
-
-- Make sure the Ruby debugger extension is installed.
-- Confirm that the selected Ruby version matches the project runtime.
-- If execution starts but breakpoints are skipped, check bundler setup and source mapping.
-`),
+    python: vscode.l10n.t(
+      "# Python Debugging Tips\n\n- Make sure the Python extension is installed and the correct interpreter is selected.\n- For tests, prefer a launch configuration that uses your test runner explicitly.\n- If the script starts but breakpoints are skipped, check source path mappings and virtual environment activation.\n",
+    ),
+    javascript: vscode.l10n.t(
+      "# JavaScript Debugging Tips\n\n- Use a Node-compatible debug type such as `pwa-node`.\n- Make sure the file you launch is runnable JavaScript or is loaded through a transpilation setup.\n- Verify `cwd`, `program`, and source maps when breakpoints do not bind.\n",
+    ),
+    typescript: vscode.l10n.t(
+      "# TypeScript Debugging Tips\n\n- Prefer a Node-based debug configuration that understands transpiled output or source maps.\n- If you debug the source file directly, confirm that your runtime can execute TypeScript.\n- Check `outFiles` and source maps when breakpoints land in compiled output instead of source.\n",
+    ),
+    java: vscode.l10n.t(
+      "# Java Debugging Tips\n\n- Make sure the Java language support extension is installed.\n- Prefer a launch configuration that resolves the correct main class or test class.\n- If the debugger cannot attach, verify the project structure and classpath resolution.\n",
+    ),
+    csharp: vscode.l10n.t(
+      "# C# Debugging Tips\n\n- Make sure the C# / .NET debugging extension is installed.\n- Open the solution or project root so the debugger can resolve the build output.\n- If the session fails to start, confirm that the target project builds successfully first.\n",
+    ),
+    go: vscode.l10n.t(
+      "# Go Debugging Tips\n\n- Make sure the Go extension is installed and configured.\n- Verify that the current workspace contains a runnable Go module or package.\n- If breakpoints are skipped, confirm that the binary was built with matching source paths.\n",
+    ),
+    rust: vscode.l10n.t(
+      "# Rust Debugging Tips\n\n- Make sure your Rust debug extension and debugger backend are installed.\n- Prefer a debug configuration that launches the compiled binary with matching symbols.\n- If the session stops in unexpected locations, check build profile and debug symbol generation.\n",
+    ),
+    php: vscode.l10n.t(
+      "# PHP Debugging Tips\n\n- Make sure the PHP debugger extension is installed and configured.\n- Verify the PHP interpreter path and any remote or container mappings.\n- If breakpoints do not bind, confirm that the web server or CLI entrypoint matches the launched file.\n",
+    ),
+    ruby: vscode.l10n.t(
+      "# Ruby Debugging Tips\n\n- Make sure the Ruby debugger extension is installed.\n- Confirm that the selected Ruby version matches the project runtime.\n- If execution starts but breakpoints are skipped, check bundler setup and source mapping.\n",
+    ),
   };
 
   return contentByLanguage[language];

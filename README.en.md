@@ -163,6 +163,8 @@ The extension also ships a Copilot skill (`VS Code Debug Tools Guide`) that teac
   npm run lint    # lint the sources
   ```
 
+- UI strings live in `l10n/bundle.l10n.json`: run `npm run l10n` after changing any `vscode.l10n.t(...)` call to regenerate the master bundle. `npm run l10n:xlf` exports an XLIFF for translators and `npm run l10n:import` imports it back — note that the import replaces the target-language bundle wholesale, so untranslated entries are dropped.
+
 ## Related resources
 
 - [Use MCP servers in VS Code](https://code.visualstudio.com/docs/copilot/chat/mcp-servers)

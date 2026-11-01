@@ -23,4 +23,13 @@ export default [
       ...tseslint.configs.recommended.rules,
     },
   },
+  {
+    // 仓库内的 Node.js 脚本（CommonJS），需要 Node 全局变量
+    files: ["scripts/**/*.js"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "commonjs",
+      globals: globals.node,
+    },
+  },
 ];

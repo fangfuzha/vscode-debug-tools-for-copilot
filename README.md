@@ -163,6 +163,8 @@ DebugMCP 兼容入口
   npm run lint    # 代码检查
   ```
 
+- 界面文案由 `l10n/bundle.l10n.json` 驱动：改完源码里的 `vscode.l10n.t(...)` 后执行 `npm run l10n` 重新生成母版文件；`npm run l10n:xlf` 可导出 XLIFF 交给译者，用 `npm run l10n:import` 回灌（注意该命令会整体覆盖目标语言 bundle，未翻译的条目会被清空）。
+
 ## 相关资源
 
 - [在 VS Code 中使用 MCP 服务器](https://code.visualstudio.com/docs/copilot/chat/mcp-servers)

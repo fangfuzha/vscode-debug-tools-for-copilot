@@ -96,7 +96,11 @@
     "bundle": "esbuild src/extension.ts --bundle --platform=node --target=node20 --outfile=out/extension.js --external:vscode --minify",
     "watch": "tsc -watch -p ./",
     "test": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
+    "lint": "eslint src scripts",
+    "l10n": "vscode-l10n-dev export --outDir ./l10n src && node -e \"const fs=require('fs');const p='l10n/bundle.l10n.json';if(process.platform==='win32'){const s=fs.readFileSync(p,'utf8').replace(/\\r/g,'').split(String.fromCharCode(10)).join(String.fromCharCode(13,10));fs.writeFileSync(p,s,'utf8')}\"",
+    "l10n:check": "node scripts/l10n-check.js",
+    "l10n:xlf": "node -e \"require('fs').mkdirSync('l10n-xlf',{recursive:true})\" && vscode-l10n-dev generate-xlf --outFile ./l10n-xlf/bundle.l10n.xlf ./l10n/bundle.l10n.json",
+    "l10n:import": "vscode-l10n-dev import-xlf --outDir ./l10n ./l10n-xlf",
     "package": "npm run bundle && vsce package"
   },
   "devDependencies": {
@@ -106,6 +110,7 @@
     "@types/vscode": "^1.144.0",
     "@typescript-eslint/eslint-plugin": "^8.72.1",
     "@typescript-eslint/parser": "^8.72.1",
+    "@vscode/l10n-dev": "^0.0.35",
     "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "4.1.0",
     "esbuild": "^0.28.2",
@@ -116,5 +121,8 @@
   "allowScripts": {
     "esbuild": true,
     "@vscode/vsce-sign": true
+  },
+  "overrides": {
+    "glob": "^14.0.3"
   }
 }

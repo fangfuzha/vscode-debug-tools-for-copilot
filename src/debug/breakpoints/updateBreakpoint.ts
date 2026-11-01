@@ -38,7 +38,9 @@ export function registerUpdateBreakpointTool(server: McpServerLike): void {
             value.hitCondition !== undefined ||
             value.logMessage !== undefined,
           {
-            message: "At least one editable breakpoint field must be provided.",
+            message: vscode.l10n.t(
+              "At least one editable breakpoint field must be provided.",
+            ),
           },
         ),
     },
